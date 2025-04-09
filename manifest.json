@@ -1,10 +1,11 @@
-
 {
   "name": "Gestão Financeira",
   "short_name": "Finanças",
+  "description": "App simples para controle de finanças, lembretes e metas.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "background_color": "#f4f6f9",
   "theme_color": "#2563eb",
   "icons": [
     {
