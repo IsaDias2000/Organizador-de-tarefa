@@ -1,22 +1,26 @@
 {
   "name": "Gestão Financeira",
   "short_name": "Finanças",
-  "description": "App simples para controle de finanças, lembretes e metas.",
-  "start_url": "./index.html",
+  "description": "Organize seus lançamentos, lembretes e metas financeiras de forma simples e intuitiva.",
+  "start_url": "/Organizador-de-tarefa/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#f4f6f9",
+  "background_color": "#ffffff",
   "theme_color": "#2563eb",
+  "orientation": "portrait",
+  "lang": "pt-BR",
+  "categories": ["finance", "productivity", "tools"],
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "/Organizador-de-tarefa/icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "/Organizador-de-tarefa/icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable any"
     }
   ]
 }
