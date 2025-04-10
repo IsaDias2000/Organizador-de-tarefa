@@ -136,7 +136,23 @@
     }
   </style>
 </head>
+  
 <body>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('/Organizador-de-tarefa/service-worker.js')
+      .then(() => console.log('✅ Service Worker registrado'))
+      .catch((err) => console.error('❌ Falha no SW:', err));
+    
+    if ('SyncManager' in window) {
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.sync.register("sync-dados");
+      });
+    }
+  }
+</script>
+
   <!-- Botão para instalar -->
 <button id="install-button" style="
   display: none;
