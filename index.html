@@ -453,4 +453,18 @@
   updatePaymentInfo();
   updateReminders();
   updateCompletedReminders();
+
+  if ('serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .register('/Organizador-de-tarefa/service-worker.js')
+    .then(() => console.log("✅ SW registrado"))
+    .catch(console.error);
+
+  if ('SyncManager' in window) {
+    navigator.serviceWorker.ready.then((registration) => {
+      registration.sync.register("sync-transactions");
+    });
+  }
+}
+
 </script>
