@@ -9,14 +9,14 @@ const FILES_TO_CACHE = [
   "/Organizador-de-tarefa/icons/icon-512.png"
 ];
 
-// Instala e armazena arquivos
+// Instala e armazena os arquivos no cache
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
   );
 });
 
-// Limpa caches antigos
+// Remove caches antigos
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keyList) =>
@@ -31,14 +31,14 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Busca arquivos do cache primeiro
+// Atende as requisições usando o cache primeiro
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => response || fetch(event.request))
   );
 });
 
-// Background sync (básico)
+// Sincronização em segundo plano
 self.addEventListener("sync", (event) => {
   if (event.tag === "sync-dados") {
     event.waitUntil(syncData());
@@ -46,6 +46,6 @@ self.addEventListener("sync", (event) => {
 });
 
 async function syncData() {
-  console.log("🔄 Simulando sincronização offline...");
-  // Aqui você poderia enviar dados para um servidor se tivesse um
+  console.log("🔄 Simulando sincronização offline com servidor...");
+  // Aqui você poderia implementar integração com API futuramente
 }
