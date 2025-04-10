@@ -8,6 +8,15 @@ const FILES_TO_CACHE = [
   "/Organizador-de-tarefa/icons/icon-192.png",
   "/Organizador-de-tarefa/icons/icon-512.png"
 ];
+self.addEventListener("install", (event) => {
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE)));
+});
+
+self.addEventListener("fetch", (event) => {
+  event.respondWith(
+    caches.match(event.request).then(response => response || fetch(event.request))
+  );
+});
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -47,4 +56,15 @@ self.addEventListener("sync", (event) => {
 async function syncData() {
   console.log("🔄 Sincronizando dados offline...");
   // Aqui você pode implementar lógica de sincronização com API futuramente
+  self.addEventListener("sync", (event) => {
+  if (event.tag === "sync-dados") {
+    event.waitUntil(syncData());
+  }
+});
+
+async function syncData() {
+  // Simulação: sincronizar dados com servidor
+  console.log("🔄 Sincronizando dados offline com o servidor...");
+}
+
 }
