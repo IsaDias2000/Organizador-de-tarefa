@@ -6,15 +6,11 @@
   "start_url": "/Organizador-de-tarefa/",
   "scope": "/Organizador-de-tarefa/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#2563eb",
   "orientation": "portrait",
   "lang": "pt-BR",
   "dir": "ltr",
-  "prefer_related_applications": false,
-  "launch_handler": {
-    "client_mode": "navigate-existing"
-  },
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
   "icons": [
     {
       "src": "/Organizador-de-tarefa/icons/icon-192.png",
@@ -34,15 +30,19 @@
       "src": "/Organizador-de-tarefa/screenshots/screenshot1.png",
       "sizes": "640x480",
       "type": "image/png",
-      "label": "Tela de Lançamentos"
+      "label": "Tela de lançamentos financeiros"
     },
     {
       "src": "/Organizador-de-tarefa/screenshots/screenshot2.png",
       "sizes": "640x480",
       "type": "image/png",
-      "label": "Controle de Lembretes"
+      "label": "Lembretes e metas"
     }
   ],
-  "iarc_rating_id": "",
-  "categories": ["finance", "productivity", "tools"]
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "iarc_rating_id": "pending",
+  "prefer_related_applications": false,
+  "related_applications": []
 }
