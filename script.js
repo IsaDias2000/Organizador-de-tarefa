@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const value = parseFloat(document.getElementById("amount").value.replace(",", "."));
     const cat = document.getElementById("category").value;
     const installments = parseInt(document.getElementById("installments")?.value || 1);
+    const type = document.getElementById("type").value;
 
     if (!desc || isNaN(value) || value <= 0) {
       feedback.textContent = "⚠️ Preencha todos os campos corretamente!";
@@ -44,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const transaction = { desc, value, cat, installments };
+    const transaction = { desc, value, cat, installments, type };
     transactions.push(transaction);
     localStorage.setItem("transactions", JSON.stringify(transactions));
     feedback.textContent = "✅ Lançamento adicionado com sucesso!";
@@ -77,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateCashflow() {
-    const total = transactions.reduce((acc, t) => acc + (t.cat === "receita" ? t.value : -t.value), 0);
+    const total = transactions.reduce((acc, t) => acc + (t.type === "receita" ? t.value : -t.value), 0);
     cashflowEl.textContent = `Saldo Atual: R$ ${total.toFixed(2)}`;
   }
 
