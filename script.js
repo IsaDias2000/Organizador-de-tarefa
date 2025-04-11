@@ -2,69 +2,65 @@ document.addEventListener("DOMContentLoaded", () => {
   const financeForm = document.getElementById("finance-form");
   const paymentForm = document.getElementById("payment-form");
   const reminderForm = document.getElementById("reminder-form");
-
   const transactionsList = document.getElementById("transactions");
   const cashflowEl = document.getElementById("cashflow");
   const paymentInfo = document.getElementById("payment-info");
   const remindersList = document.getElementById("reminders");
   const completedList = document.getElementById("completed-reminders");
   const themeToggle = document.getElementById("theme-toggle");
-  const amountInput = document.getElementById("amount");
+  const feedback = document.getElementById("feedback");
 
   let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
   let reminders = JSON.parse(localStorage.getItem("reminders")) || [];
   let completedReminders = JSON.parse(localStorage.getItem("completedReminders")) || [];
   let nextPaymentDate = localStorage.getItem("nextPaymentDate") || null;
 
-  // tema escuro
+  // Alternar tema
   themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
   });
 
-  // valor com casas decimais e vírgula
-  amountInput.addEventListener("input", e => {
-    e.target.value = e.target.value.replace(",", ".");
-  });
-
-  // abas
+  // Alternar abas
   document.getElementById("finance-tab").addEventListener("click", () => showTab("finance-section"));
   document.getElementById("payment-tab").addEventListener("click", () => showTab("payment-section"));
   document.getElementById("reminder-tab").addEventListener("click", () => showTab("reminder-section"));
 
   function showTab(id) {
-    document.querySelectorAll(".tab-section").forEach(sec => sec.classList.remove("active"));
+    document.querySelectorAll(".tab-section").forEach(tab => tab.classList.remove("active"));
     document.getElementById(id).classList.add("active");
   }
 
-  // lançamento
+  // Lançamentos
   financeForm.addEventListener("submit", e => {
     e.preventDefault();
     const desc = document.getElementById("description").value.trim();
-    const value = parseFloat(document.getElementById("amount").value);
+    const value = parseFloat(document.getElementById("amount").value.replace(",", "."));
     const cat = document.getElementById("category").value;
-    const installments = parseInt(document.getElementById("installments").value) || 1;
+    const installments = parseInt(document.getElementById("installments")?.value || 1);
 
-    if (!desc || isNaN(value)) {
-      alert("Preencha todos os campos corretamente.");
+    if (!desc || isNaN(value) || value <= 0) {
+      feedback.textContent = "⚠️ Preencha todos os campos corretamente!";
+      feedback.style.color = "red";
       return;
     }
 
-    const transaction = { desc, value, cat, installments, fixed: false };
+    const transaction = { desc, value, cat, installments };
     transactions.push(transaction);
     localStorage.setItem("transactions", JSON.stringify(transactions));
+    feedback.textContent = "✅ Lançamento adicionado com sucesso!";
+    feedback.style.color = "green";
+    financeForm.reset();
     updateTransactions();
     updateCashflow();
     updatePaymentInfo();
     renderCharts();
-    financeForm.reset();
   });
 
   function updateTransactions() {
     transactionsList.innerHTML = "";
     transactions.forEach((t, i) => {
       const li = document.createElement("li");
-      li.textContent = `${t.desc}: R$ ${t.value.toFixed(2)} (${t.cat})${t.installments > 1 ? ' - ' + t.installments + 'x' : ''}`;
-
+      li.textContent = `${t.desc}: R$ ${t.value.toFixed(2)} (${t.cat})${t.installments > 1 ? ` - ${t.installments}x` : ""}`;
       const del = document.createElement("button");
       del.textContent = "🗑️";
       del.onclick = () => {
@@ -75,23 +71,20 @@ document.addEventListener("DOMContentLoaded", () => {
         updatePaymentInfo();
         renderCharts();
       };
-
       li.appendChild(del);
       transactionsList.appendChild(li);
     });
   }
 
   function updateCashflow() {
-    const total = transactions.reduce((sum, t) => {
-      return sum + (t.cat === "receita" ? t.value : -t.value);
-    }, 0);
+    const total = transactions.reduce((acc, t) => acc + (t.cat === "receita" ? t.value : -t.value), 0);
     cashflowEl.textContent = `Saldo Atual: R$ ${total.toFixed(2)}`;
   }
 
   paymentForm.addEventListener("submit", e => {
     e.preventDefault();
     const data = document.getElementById("next-payment").value;
-    if (!data) return alert("Escolha uma data.");
+    if (!data) return alert("Escolha uma data válida.");
     nextPaymentDate = data;
     localStorage.setItem("nextPaymentDate", nextPaymentDate);
     updatePaymentInfo();
@@ -103,11 +96,10 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     const hoje = new Date();
-    const proxima = new Date(nextPaymentDate);
-    const dias = Math.ceil((proxima - hoje) / (1000 * 60 * 60 * 24));
-    const saldo = transactions.reduce((s, t) => t.cat === "receita" ? s + t.value : s - t.value, 0);
+    const pagamento = new Date(nextPaymentDate);
+    const dias = Math.ceil((pagamento - hoje) / (1000 * 60 * 60 * 24));
+    const saldo = transactions.reduce((acc, t) => acc + (t.cat === "receita" ? t.value : -t.value), 0);
     const diario = dias > 0 ? (saldo / dias).toFixed(2) : "0.00";
-
     paymentInfo.textContent = `Próxima data: ${nextPaymentDate} • Faltam ${dias} dias • Valor diário permitido: R$ ${diario}`;
   }
 
@@ -117,17 +109,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!texto) return;
     reminders.push(texto);
     localStorage.setItem("reminders", JSON.stringify(reminders));
-    updateReminders();
     reminderForm.reset();
+    updateReminders();
   });
 
   function updateReminders() {
     remindersList.innerHTML = "";
     reminders.forEach((r, i) => {
       const li = document.createElement("li");
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.onchange = () => {
+      const check = document.createElement("input");
+      check.type = "checkbox";
+      check.onchange = () => {
         completedReminders.push(r);
         reminders.splice(i, 1);
         localStorage.setItem("reminders", JSON.stringify(reminders));
@@ -142,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("reminders", JSON.stringify(reminders));
         updateReminders();
       };
-      li.appendChild(checkbox);
+      li.appendChild(check);
       li.appendChild(document.createTextNode(r));
       li.appendChild(del);
       remindersList.appendChild(li);
@@ -154,14 +146,14 @@ document.addEventListener("DOMContentLoaded", () => {
     completedReminders.forEach((r, i) => {
       const li = document.createElement("li");
       li.textContent = r;
-      const btn = document.createElement("button");
-      btn.textContent = "🗑️";
-      btn.onclick = () => {
+      const del = document.createElement("button");
+      del.textContent = "🗑️";
+      del.onclick = () => {
         completedReminders.splice(i, 1);
         localStorage.setItem("completedReminders", JSON.stringify(completedReminders));
         updateCompletedReminders();
       };
-      li.appendChild(btn);
+      li.appendChild(del);
       completedList.appendChild(li);
     });
   }
@@ -180,6 +172,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.barChart) window.barChart.destroy();
 
     const pieCtx = document.getElementById("pieChart")?.getContext("2d");
+    const barCtx = document.getElementById("barChart")?.getContext("2d");
+
     if (pieCtx) {
       window.pieChart = new Chart(pieCtx, {
         type: "pie",
@@ -187,29 +181,28 @@ document.addEventListener("DOMContentLoaded", () => {
           labels: ["Receitas", "Despesas"],
           datasets: [{
             data: [receitas, despesas],
-            backgroundColor: ["#4caf50", "#f44336"]
+            backgroundColor: ["#38b000", "#ef4444"]
           }]
         }
       });
     }
 
-    const barCtx = document.getElementById("barChart")?.getContext("2d");
     if (barCtx) {
       window.barChart = new Chart(barCtx, {
         type: "bar",
         data: {
           labels: Object.keys(categorias),
           datasets: [{
-            label: "Despesas por Categoria",
+            label: "Despesas por categoria",
             data: Object.values(categorias),
-            backgroundColor: "#2196f3"
+            backgroundColor: "#3b82f6"
           }]
         }
       });
     }
   }
 
-  // inicialização
+  // Inicialização
   updateTransactions();
   updateCashflow();
   updatePaymentInfo();
