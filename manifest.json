@@ -43,12 +43,13 @@
   "launch_handler": {
     "client_mode": "navigate-existing"
   },
-  "iarc_rating_id": "pending",
   "prefer_related_applications": false,
   "related_applications": [],
-  "scope_extensions": [
-    {
-      "origin": "https://isadias2000.github.io"
+  "scope_extensions": [],
+  "iarc_rating_id": "",
+  "background_sync": {
+    "periodic_sync": {
+      "min_interval": 1440
     }
-  ]
+  }
 }
