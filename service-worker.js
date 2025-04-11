@@ -57,3 +57,24 @@ async function syncData() {
   console.log("🔄 Sincronizando dados com o servidor...");
   // Aqui você pode adicionar integração futura com uma API
 }
+function updateTransactions() {
+  transactionsList.innerHTML = "";
+  transactions.forEach((t, i) => {
+    const li = document.createElement("li");
+    li.textContent = `${t.desc}: R$ ${t.value.toFixed(2)} (${t.cat})${t.installments > 1 ? ` - ${t.installments}x` : ""}`;
+
+    const del = document.createElement("button");
+    del.textContent = "🗑️";
+    del.onclick = () => {
+      transactions.splice(i, 1);
+      localStorage.setItem("transactions", JSON.stringify(transactions));
+      updateTransactions();
+      updateCashflow();
+      updatePaymentInfo();
+      renderCharts();
+    };
+
+    li.appendChild(del);
+    transactionsList.appendChild(li);
+  });
+}
