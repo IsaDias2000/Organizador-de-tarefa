@@ -81,6 +81,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const total = transactions.reduce((acc, t) => acc + (t.type === "receita" ? t.value : -t.value), 0);
     cashflowEl.textContent = `Saldo Atual: R$ ${total.toFixed(2)}`;
   }
+li.classList.add(t.type === "despesa" ? "transacao-despesa" : "transacao-receita");
+if (t.fixed) {
+  li.classList.remove("transacao-despesa");
+  li.classList.add("transacao-fixa");
+}
 
   paymentForm.addEventListener("submit", e => {
     e.preventDefault();
@@ -210,4 +215,15 @@ document.addEventListener("DOMContentLoaded", () => {
   updateReminders();
   updateCompletedReminders();
   renderCharts();
+  document.getElementById("filtro-fixas").addEventListener("click", () => {
+  const todas = document.querySelectorAll("#transactions li");
+  todas.forEach(item => {
+    if (item.classList.contains("transacao-fixa")) {
+      item.style.display = "flex";
+    } else {
+      item.style.display = "none";
+    }
+  });
+});
+
 });
