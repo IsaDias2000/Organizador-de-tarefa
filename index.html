@@ -1,217 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <link rel="manifest" href="manifest.json">
-<link rel="icon" href="icons/icon-192.png">
-<meta name="theme-color" content="#2563eb">
-  <link rel="manifest" href="manifest.json" />
-<link rel="icon" href="icons/icon-192.png" />
-<meta name="theme-color" content="#2563eb" />
-
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestão Financeira 💰</title>
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f6f9;
-      color: #1e293b;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-    }
-    <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-      .then(() => console.log("✅ Service Worker registrado com sucesso."))
-      .catch(err => console.error("Erro no Service Worker:", err));
-  }
-    </script>
-<link rel="manifest" href="manifest.json">
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js');
-  }
-</script>
-
-
-    body.dark {
-      background-color: #1e1e2f;
-      color: #f0f0f0;
-    }
-
-    .container {
-      max-width: 900px;
-      background: #fff;
-      padding: 30px;
-      margin: 20px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-
-    body.dark .container {
-      background: #2c2c3e;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    nav {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    nav button, header button, form button, #clear-transactions {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    header button {
-      background-color: #2563eb;
-      color: white;
-    }
-
-    nav button {
-      background-color: #38b000;
-      color: white;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    input, select {
-      padding: 12px;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-
-    .tab-section {
-      display: none;
-    }
-
-    .tab-section.active {
-      display: block;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    ul li {
-      background: #f1f5f9;
-      margin-bottom: 10px;
-      padding: 12px;
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    body.dark ul li {
-      background: #3a3a55;
-    }
-
-    #clear-transactions {
-      background-color: #dc2626;
-      color: white;
-    }
-
-    @media (max-width: 600px) {
-      nav {
-        flex-direction: column;
-      }
-    }
-  </style>
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-  
 <body>
-  <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker
-      .register('/Organizador-de-tarefa/service-worker.js')
-      .then(() => console.log('✅ Service Worker registrado'))
-      .catch((err) => console.error('❌ Falha no SW:', err));
-    
-    if ('SyncManager' in window) {
-      navigator.serviceWorker.ready.then((registration) => {
-        registration.sync.register("sync-dados");
-      });
-    }
-  }
-</script>
-
-  <!-- Botão para instalar -->
-<button id="install-button" style="
-  display: none;
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: #2563eb;
-  color: white;
-  padding: 12px 18px;
-  border: none;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  z-index: 1000;
-">
-  📲 Instalar App
-</button>
-
-<!-- Service Worker + Instalação -->
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-      .then(() => console.log("✅ Service Worker registrado"))
-      .catch(err => console.error("❌ SW erro:", err));
-  }
-
-  let deferredPrompt;
-  const installBtn = document.getElementById("install-button");
-
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installBtn.style.display = "block";
-  });
-
-  installBtn.addEventListener("click", async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") {
-      console.log("📲 App instalado!");
-    }
-    installBtn.style.display = "none";
-    deferredPrompt = null;
-  });
-
-  window.addEventListener("appinstalled", () => {
-    console.log("✅ App instalado com sucesso.");
-    installBtn.style.display = "none";
-  });
-</script>
+  <button id="install-button" style="display:none;">📲 Instalar App</button>
 
   <div class="container">
     <header>
@@ -221,22 +21,22 @@
 
     <nav>
       <button id="finance-tab">Lançamentos 📋</button>
-      <button id="payment-tab">Próxima Data Para Pagamento 📅</button>
+      <button id="payment-tab">Próxima Data 📅</button>
       <button id="reminder-tab">Lembretes 📌</button>
     </nav>
 
-    <div id="finance-section" class="tab-section active">
+    <section id="finance-section" class="tab-section active">
       <h2>Lançamentos 📋</h2>
       <form id="finance-form">
         <input type="text" id="description" placeholder="Descrição 📝" required>
-        <input type="number" id="amount" placeholder="Valor 💵" required>
-        <select id="type">
+        <input type="number" step="0.01" id="amount" placeholder="Valor 💵" required>
+        <select id="type" required>
           <option value="receita">Receita ⤵</option>
           <option value="despesa">Despesa ⤴</option>
         </select>
         <input type="text" id="category" placeholder="Categoria 🔖" required>
         <label><input type="checkbox" id="fixed"> Marcar como despesa fixa 📌</label>
-        <button type="submit">Adicionar Lançamento ➕</button>
+        <button type="submit">Adicionar ➕</button>
       </form>
 
       <p id="cashflow">Saldo Atual: R$ 0.00</p>
@@ -245,18 +45,18 @@
       <p id="gasto-diario-info">Valor diário permitido: --</p>
       <ul id="transactions"></ul>
       <button id="clear-transactions">🧹 Limpar Todos os Lançamentos</button>
-    </div>
+    </section>
 
-    <div id="payment-section" class="tab-section">
+    <section id="payment-section" class="tab-section">
       <h2>Próxima Data de Pagamento 📅</h2>
       <form id="payment-form">
-        <input type="date" id="next-payment" required>
+        <input type="date" id="next-payment" required />
         <button type="submit">Salvar Data</button>
       </form>
       <p id="payment-info">Nenhuma data definida.</p>
-    </div>
+    </section>
 
-    <div id="reminder-section" class="tab-section">
+    <section id="reminder-section" class="tab-section">
       <h2>Lembretes 📌</h2>
       <form id="reminder-form">
         <input type="text" id="reminder" placeholder="Adicionar novo lembrete" required>
@@ -266,243 +66,41 @@
       <ul id="reminders"></ul>
       <h3>Concluídos ✅:</h3>
       <ul id="completed-reminders"></ul>
-    </div>
+    </section>
   </div>
-<script>
-  
-  const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-  const reminders = JSON.parse(localStorage.getItem("reminders")) || [];
-  const completedReminders = JSON.parse(localStorage.getItem("completedReminders")) || [];
-  let nextPaymentDate = localStorage.getItem("nextPaymentDate") || null;
 
-  const themeToggle = document.getElementById("theme-toggle");
-  const financeForm = document.getElementById("finance-form");
-  const paymentForm = document.getElementById("payment-form");
-  const reminderForm = document.getElementById("reminder-form");
-
-  // Trocar tema claro/escuro
-  themeToggle.onclick = () => {
-    document.body.classList.toggle("dark");
-    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-  };
-
-  // Aplicar tema salvo
-  function aplicarTemaSalvo() {
-    if (localStorage.getItem("theme") === "dark") {
-      document.body.classList.add("dark");
-    }
-  }
-
-  // Alternar abas
-  document.getElementById("finance-tab").onclick = () => showTab("finance");
-  document.getElementById("payment-tab").onclick = () => showTab("payment");
-  document.getElementById("reminder-tab").onclick = () => showTab("reminder");
-
-  function showTab(tab) {
-    document.querySelectorAll(".tab-section").forEach(el => el.classList.remove("active"));
-    document.getElementById(`${tab}-section`).classList.add("active");
-  }
-
-  // Lançamento de finanças
-  financeForm.onsubmit = (e) => {
-    e.preventDefault();
-    const description = document.getElementById("description").value.trim();
-    const amount = parseFloat(document.getElementById("amount").value);
-    const type = document.getElementById("type").value;
-    const category = document.getElementById("category").value.trim();
-    const fixed = document.getElementById("fixed").checked;
-    const date = new Date().toISOString().split("T")[0];
-
-    if (!description || isNaN(amount)) return;
-
-    transactions.push({ description, amount, type, category, fixed, date });
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-    financeForm.reset();
-    updateFinance();
-  };
-
-  function updateFinance() {
-    const list = document.getElementById("transactions");
-    const cashflow = document.getElementById("cashflow");
-    const daily = document.getElementById("daily-expense");
-    const fixed = document.getElementById("fixed-expenses");
-
-    list.innerHTML = "";
-    let saldo = 0;
-    let hoje = new Date().toISOString().split("T")[0];
-    let hojeTotal = 0;
-    let fixas = [];
-
-    transactions.forEach((t, i) => {
-      const li = document.createElement("li");
-      const prefix = t.type === "receita" ? "🟢" : "🔴";
-      const tags = t.fixed ? " 📌" : "";
-      li.textContent = `${prefix} ${t.description} - R$ ${t.amount.toFixed(2)} (${t.category})${tags}`;
-
-      const del = document.createElement("button");
-      del.textContent = "🗑️";
-      del.onclick = () => {
-        transactions.splice(i, 1);
-        localStorage.setItem("transactions", JSON.stringify(transactions));
-        updateFinance();
-      };
-      li.appendChild(del);
-      list.appendChild(li);
-
-      saldo += t.type === "receita" ? t.amount : -t.amount;
-      if (t.date === hoje && t.type === "despesa") hojeTotal += t.amount;
-      if (t.type === "despesa" && t.fixed) fixas.push(t);
-    });
-
-    cashflow.textContent = `Saldo Atual: R$ ${saldo.toFixed(2)}`;
-    daily.textContent = `Gastos de Hoje: R$ ${hojeTotal.toFixed(2)}`;
-    fixed.textContent = `Despesas Fixas: ${fixas.length} itens • Total: R$ ${fixas.reduce((a, b) => a + b.amount, 0).toFixed(2)}`;
-    updateGastoDiario(saldo);
-  }
-
-  function updateGastoDiario(saldo = null) {
-    const info = document.getElementById("gasto-diario-info");
-    if (!nextPaymentDate) {
-      info.textContent = "Valor diário permitido: --";
-      return;
-    }
-
-    if (saldo === null) {
-      saldo = transactions.reduce((a, b) =>
-        a + (b.type === "receita" ? b.amount : -b.amount), 0);
-    }
-
-    const hoje = new Date();
-    const pagamento = new Date(nextPaymentDate);
-    const dias = Math.ceil((pagamento - hoje) / (1000 * 60 * 60 * 24));
-    if (dias <= 0) {
-      info.textContent = "Dia do pagamento chegou! 🎉";
-      return;
-    }
-
-    const porDia = saldo / dias;
-    info.textContent = `Faltam ${dias} dias • Valor diário permitido: R$ ${porDia.toFixed(2)}`;
-  }
-
-  document.getElementById("clear-transactions").onclick = () => {
-    if (confirm("Deseja apagar todos os lançamentos?")) {
-      transactions.length = 0;
-      localStorage.setItem("transactions", JSON.stringify(transactions));
-      updateFinance();
-    }
-  };
-
-  paymentForm.onsubmit = (e) => {
-    e.preventDefault();
-    const data = document.getElementById("next-payment").value;
-    nextPaymentDate = data;
-    localStorage.setItem("nextPaymentDate", data);
-    updatePaymentInfo();
-  };
-
-  function updatePaymentInfo() {
-    const info = document.getElementById("payment-info");
-    info.textContent = nextPaymentDate
-      ? `Próxima data de pagamento: ${nextPaymentDate}`
-      : "Nenhuma data definida.";
-    updateGastoDiario();
-  }
-
-  reminderForm.onsubmit = (e) => {
-    e.preventDefault();
-    const texto = document.getElementById("reminder").value.trim();
-    if (!texto) return;
-    reminders.push(texto);
-    localStorage.setItem("reminders", JSON.stringify(reminders));
-    reminderForm.reset();
-    updateReminders();
-  };
-
-  function updateReminders() {
-    const list = document.getElementById("reminders");
-    list.innerHTML = "";
-    reminders.forEach((txt, i) => {
-      const li = document.createElement("li");
-      const cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.className = "checkbox";
-      cb.onchange = () => {
-        completedReminders.push(txt);
-        reminders.splice(i, 1);
-        salvarLembretes();
-      };
-
-      const del = document.createElement("button");
-      del.textContent = "🗑️";
-      del.onclick = () => {
-        reminders.splice(i, 1);
-        salvarLembretes();
-      };
-
-      li.appendChild(cb);
-      li.appendChild(document.createTextNode(txt));
-      li.appendChild(del);
-      list.appendChild(li);
-    });
-  }
-
-  function updateCompletedReminders() {
-    const list = document.getElementById("completed-reminders");
-    list.innerHTML = "";
-    completedReminders.forEach((txt, i) => {
-      const li = document.createElement("li");
-      li.textContent = txt;
-      const del = document.createElement("button");
-      del.textContent = "🗑️";
-      del.onclick = () => {
-        completedReminders.splice(i, 1);
-        salvarLembretes();
-      };
-      li.appendChild(del);
-      list.appendChild(li);
-    });
-  }
-
-  function salvarLembretes() {
-    localStorage.setItem("reminders", JSON.stringify(reminders));
-    localStorage.setItem("completedReminders", JSON.stringify(completedReminders));
-    updateReminders();
-    updateCompletedReminders();
-  }
-
-  // Inicialização
-  aplicarTemaSalvo();
-  updateFinance();
-  updatePaymentInfo();
-  updateReminders();
-  updateCompletedReminders();
-
-  if ('serviceWorker' in navigator) {
-  navigator.serviceWorker
-    .register('/Organizador-de-tarefa/service-worker.js')
-    .then(() => console.log("✅ SW registrado"))
-    .catch(console.error);
-
-  if ('SyncManager' in window) {
-    navigator.serviceWorker.ready.then((registration) => {
-      registration.sync.register("sync-transactions");
-    });
-  }
-}
-
-</script>
+  <script src="script.js"></script>
   <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker
-      .register('/Organizador-de-tarefa/service-worker.js')
-      .then(() => console.log('✅ Service Worker registrado'))
-      .catch((err) => console.error('❌ Erro ao registrar SW:', err));
-
-    if ('SyncManager' in window) {
-      navigator.serviceWorker.ready.then((registration) => {
-        registration.sync.register("sync-dados");
-      });
+    // Registrar Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('✅ Service Worker registrado'))
+        .catch(err => console.error('❌ Falha no Service Worker', err));
     }
-  }
-</script>
 
+    // Botão de instalação PWA
+    let deferredPrompt;
+    const installBtn = document.getElementById('install-button');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'block';
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') console.log('📲 App instalado!');
+      installBtn.style.display = 'none';
+      deferredPrompt = null;
+    });
+
+    window.addEventListener('appinstalled', () => {
+      console.log('✅ App instalado com sucesso.');
+      installBtn.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
