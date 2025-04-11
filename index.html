@@ -30,6 +30,12 @@
       .then(() => console.log("✅ Service Worker registrado com sucesso."))
       .catch(err => console.error("Erro no Service Worker:", err));
   }
+    </script>
+<link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
+  }
 </script>
 
 
