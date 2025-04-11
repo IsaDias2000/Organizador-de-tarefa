@@ -182,5 +182,17 @@ body.dark canvas {
 
   canvas {
     max-width: 100%;
+    /* Estilo para despesas normais */
+.transacao-despesa {
+  background-color: #fee2e2; /* tom vermelho claro */
+  color: #b91c1c;
+}
+
+/* Estilo para despesas fixas */
+.transacao-fixa {
+  background-color: #ede9fe; /* tom roxo claro */
+  color: #6b21a8;
+}
+
   }
 }
