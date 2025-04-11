@@ -1,4 +1,5 @@
 const CACHE_NAME = "gestao-financeira-v2";
+
 const FILES_TO_CACHE = [
   "/Organizador-de-tarefa/",
   "/Organizador-de-tarefa/index.html",
@@ -12,29 +13,35 @@ const FILES_TO_CACHE = [
 // Instala e armazena os arquivos no cache
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(FILES_TO_CACHE);
+    })
   );
+  self.skipWaiting();
 });
 
-// Remove caches antigos
+// Remove caches antigos ao ativar novo service worker
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keyList) =>
-      Promise.all(
+    caches.keys().then((keyList) => {
+      return Promise.all(
         keyList.map((key) => {
           if (key !== CACHE_NAME) {
             return caches.delete(key);
           }
         })
-      )
-    )
+      );
+    })
   );
+  self.clients.claim();
 });
 
-// Atende as requisições usando o cache primeiro
+// Atende as requisições com cache primeiro, depois rede
 self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => response || fetch(event.request))
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    })
   );
 });
 
@@ -45,30 +52,8 @@ self.addEventListener("sync", (event) => {
   }
 });
 
+// Simulação de função de sincronização futura
 async function syncData() {
-  console.log("🔄 Simulando sincronização offline com servidor...");
-  // Aqui você poderia implementar integração com API futuramente
+  console.log("🔄 Sincronizando dados com o servidor...");
+  // Aqui você pode adicionar integração futura com uma API
 }
-const CACHE_NAME = 'finance-app-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/script.js',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
-];
-
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
-  );
-});
-
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
-  );
-});
