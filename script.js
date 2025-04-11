@@ -15,6 +15,17 @@ document.addEventListener("DOMContentLoaded", () => {
   let completedReminders = JSON.parse(localStorage.getItem("completedReminders")) || [];
   let nextPaymentDate = localStorage.getItem("nextPaymentDate") || null;
 
+  document.getElementById("filtro-fixas").addEventListener("click", () => {
+  const todas = document.querySelectorAll("#transactions li");
+  todas.forEach(item => {
+    if (item.classList.contains("transacao-fixa")) {
+      item.style.display = "flex";
+    } else {
+      item.style.display = "none";
+    }
+  });
+});
+
   // Alternar tema
   themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
