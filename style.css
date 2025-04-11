@@ -149,6 +149,19 @@ canvas {
   padding: 10px;
   max-width: 400px;
 }
+  canvas {
+    max-width: 100%;
+    /* Estilo para despesas normais */
+.transacao-despesa {
+  background-color: #fee2e2; /* tom vermelho claro */
+  color: #b91c1c;
+}
+
+/* Estilo para despesas fixas */
+.transacao-fixa {
+  background-color: #ede9fe; /* tom roxo claro */
+  color: #6b21a8;
+}
 
 body.dark canvas {
   background: #2e2e3e;
@@ -178,21 +191,5 @@ body.dark canvas {
   select,
   button {
     font-size: 0.85rem;
-  }
-
-  canvas {
-    max-width: 100%;
-    /* Estilo para despesas normais */
-.transacao-despesa {
-  background-color: #fee2e2; /* tom vermelho claro */
-  color: #b91c1c;
-}
-
-/* Estilo para despesas fixas */
-.transacao-fixa {
-  background-color: #ede9fe; /* tom roxo claro */
-  color: #6b21a8;
-}
-
   }
 }
