@@ -1,62 +1,102 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Aplicativo de gestão financeira pessoal com controle de gastos, receitas e lembretes">
   <title>Gestão Financeira 💰</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
   <meta name="theme-color" content="#2563eb" />
   <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" async></script>
 </head>
 <body>
   <div class="container">
     <header>
       <h1>Gestão Financeira 💸</h1>
-      <button id="theme-toggle">🌞 / 🌜</button>
+      <button id="theme-toggle" aria-label="Alternar tema claro/escuro">🌞 / 🌜</button>
     </header>
-    <nav>
-      <button id="finance-tab">Lançamentos 📋</button>
-      <button id="payment-tab">Próxima Data 📅</button>
-      <button id="reminder-tab">Lembretes 📌</button>
+    
+    <nav aria-label="Navegação principal">
+      <button id="finance-tab" aria-controls="finance-section" aria-selected="true">Lançamentos 📋</button>
+      <button id="payment-tab" aria-controls="payment-section" aria-selected="false">Próxima Data 📅</button>
+      <button id="reminder-tab" aria-controls="reminder-section" aria-selected="false">Lembretes 📌</button>
     </nav>
-    <section id="finance-section" class="tab-section active">
-      <form id="finance-form">
-        <input type="text" id="description" placeholder="Descrição" required />
-        <input type="text" id="amount" placeholder="Valor" required />
-        <select id="type" required>
-          <option value="receita">Receita</option>
-          <option value="despesa">Despesa</option>
-        </select>
-        <input type="text" id="category" placeholder="Categoria" required />
-        <label><input type="checkbox" id="fixed" /> Despesa Fixa</label>
-        <input type="number" id="installments" min="1" placeholder="Parcelas (opcional)" />
-        <button type="submit">Adicionar</button>
-        <p id="feedback"></p>
-      </form>
-      <ul id="transactions"></ul>
-      <button id="clear-transactions">Limpar Tudo</button>
-      <canvas id="pieChart"></canvas>
-      <canvas id="barChart"></canvas>
-    </section>
-    <section id="payment-section" class="tab-section">
-      <form id="payment-form">
-        <input type="date" id="next-payment" required />
-        <button type="submit">Salvar</button>
-      </form>
-      <p id="payment-info">Nenhuma data definida.</p>
-    </section>
-    <section id="reminder-section" class="tab-section">
-      <form id="reminder-form">
-        <input type="text" id="reminder" placeholder="Adicionar lembrete" required />
-        <button type="submit">Salvar</button>
-      </form>
-      <ul id="reminders"></ul>
-      <ul id="completed-reminders"></ul>
-    </section>
+    
+    <main>
+      <section id="finance-section" class="tab-section active" aria-labelledby="finance-tab">
+        <form id="finance-form">
+          <fieldset>
+            <legend>Adicionar Transação</legend>
+            <label for="description">Descrição</label>
+            <input type="text" id="description" placeholder="Ex: Salário" required />
+            
+            <label for="amount">Valor (R$)</label>
+            <input type="number" id="amount" placeholder="0,00" step="0.01" required />
+            
+            <label for="type">Tipo</label>
+            <select id="type" required>
+              <option value="receita">Receita</option>
+              <option value="despesa">Despesa</option>
+            </select>
+            
+            <label for="category">Categoria</label>
+            <input type="text" id="category" placeholder="Ex: Alimentação" required />
+          </fieldset>
+          
+          <fieldset>
+            <legend>Opções Adicionais</legend>
+            <label><input type="checkbox" id="fixed" /> Despesa Fixa</label>
+            
+            <label for="installments">Parcelas (opcional)</label>
+            <input type="number" id="installments" min="1" max="36" placeholder="1" />
+          </fieldset>
+          
+          <button type="submit">Adicionar</button>
+          <p id="feedback" aria-live="polite"></p>
+        </form>
+        
+        <div id="transactions" role="region" aria-live="polite">
+          <h2>Histórico</h2>
+          <ul id="transactions-list"></ul>
+        </div>
+        
+        <div class="charts-container">
+          <canvas id="pieChart" aria-label="Gráfico de pizza de receitas e despesas"></canvas>
+          <canvas id="barChart" aria-label="Gráfico de barras de transações por categoria"></canvas>
+        </div>
+        
+        <button id="clear-transactions" class="danger">Limpar Tudo</button>
+      </section>
+      
+      <section id="payment-section" class="tab-section" aria-labelledby="payment-tab" hidden>
+        <form id="payment-form">
+          <label for="next-payment">Próxima Data de Pagamento</label>
+          <input type="date" id="next-payment" required />
+          <button type="submit">Salvar</button>
+        </form>
+        <p id="payment-info">Nenhuma data definida.</p>
+      </section>
+      
+      <section id="reminder-section" class="tab-section" aria-labelledby="reminder-tab" hidden>
+        <form id="reminder-form">
+          <label for="reminder">Novo Lembrete</label>
+          <input type="text" id="reminder" placeholder="Ex: Pagar conta de luz" required />
+          <button type="submit">Adicionar</button>
+        </form>
+        
+        <div id="reminders-container">
+          <h2>Lembretes Ativos</h2>
+          <ul id="reminders"></ul>
+          
+          <h2>Concluídos</h2>
+          <ul id="completed-reminders"></ul>
+        </div>
+      </section>
+    </main>
   </div>
-  <script src="script.js"></script>
+  
+  <script src="script.js" type="module"></script>
 </body>
 </html>
