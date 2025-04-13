@@ -15,10 +15,7 @@
   <div class="container">
     <header>
       <h1><i class="fas fa-wallet"></i> Gestão Financeira</h1>
-      <div class="header-actions">
-        <button id="theme-toggle" aria-label="Alternar tema"><i class="fas fa-moon"></i></button>
-        <button id="add-category" aria-label="Adicionar categoria"><i class="fas fa-tag"></i></button>
-      </div>
+      <button id="theme-toggle" aria-label="Alternar tema"><i class="fas fa-moon"></i></button>
     </header>
 
     <div class="balance-container">
@@ -38,26 +35,13 @@
 
     <nav>
       <button class="tab-button active" data-tab="transactions"><i class="fas fa-exchange-alt"></i> Lançamentos</button>
-      <button class="tab-button" data-tab="fixed"><i class="fas fa-calendar-alt"></i> Fixas/Recorrentes</button>
+      <button class="tab-button" data-tab="fixed"><i class="fas fa-calendar-alt"></i> Fixas</button>
       <button class="tab-button" data-tab="reports"><i class="fas fa-chart-pie"></i> Relatórios</button>
     </nav>
 
     <main>
       <!-- Aba de Lançamentos -->
       <section id="transactions" class="tab-content active">
-        <div class="filters">
-          <select id="filter-type">
-            <option value="all">Todos</option>
-            <option value="income">Receitas</option>
-            <option value="expense">Despesas</option>
-          </select>
-          <select id="filter-category">
-            <option value="all">Todas Categorias</option>
-          </select>
-          <input type="month" id="filter-month">
-          <button id="clear-filters"><i class="fas fa-times"></i> Limpar</button>
-        </div>
-
         <form id="transaction-form">
           <div class="form-row">
             <div class="form-group">
@@ -94,13 +78,13 @@
           <div class="form-row">
             <div class="form-group">
               <label for="transaction-installments">
-                <input type="checkbox" id="transaction-parceled"> Parcelado?
+                <input type="checkbox" id="transaction-parceled"> Parcelar
               </label>
               <input type="number" id="transaction-installments" min="2" max="36" value="2" disabled>
             </div>
             <div class="form-group">
               <label for="transaction-fixed">
-                <input type="checkbox" id="transaction-fixed"> Fixa/Recorrente
+                <input type="checkbox" id="transaction-fixed"> Fixa
               </label>
             </div>
           </div>
@@ -110,27 +94,54 @@
           </button>
         </form>
 
+        <!-- Filtros reorganizados acima do histórico -->
+        <div class="filters-container">
+          <h3>Filtrar Lançamentos</h3>
+          <div class="filters">
+            <select id="filter-type">
+              <option value="all">Todos</option>
+              <option value="income">Receitas</option>
+              <option value="expense">Despesas</option>
+            </select>
+            <select id="filter-category">
+              <option value="all">Todas Categorias</option>
+            </select>
+            <select id="filter-status">
+              <option value="all">Todos</option>
+              <option value="fixed">Apenas Fixas</option>
+              <option value="parceled">Apenas Parceladas</option>
+            </select>
+            <input type="month" id="filter-month">
+            <button id="clear-filters" class="btn-secondary">
+              <i class="fas fa-times"></i> Limpar
+            </button>
+          </div>
+        </div>
+
         <div class="transactions-list">
-          <h3>Últimos Lançamentos</h3>
+          <h3>Histórico de Lançamentos</h3>
           <ul id="transactions-container"></ul>
         </div>
       </section>
 
-      <!-- Aba de Contas Fixas/Recorrentes -->
+      <!-- Aba de Contas Fixas -->
       <section id="fixed" class="tab-content">
-        <div class="filters">
-          <select id="filter-fixed-type">
-            <option value="all">Todas</option>
-            <option value="paid">Pagas</option>
-            <option value="unpaid">A pagar</option>
-          </select>
-          <select id="filter-fixed-category">
-            <option value="all">Todas Categorias</option>
-          </select>
+        <div class="filters-container">
+          <h3>Filtrar Contas Fixas</h3>
+          <div class="filters">
+            <select id="filter-fixed-status">
+              <option value="all">Todas</option>
+              <option value="paid">Pagas</option>
+              <option value="unpaid">A pagar</option>
+            </select>
+            <select id="filter-fixed-category">
+              <option value="all">Todas Categorias</option>
+            </select>
+          </div>
         </div>
 
-        <div class="fixed-list">
-          <h3>Contas Fixas/Recorrentes</h3>
+        <div class="transactions-list">
+          <h3>Contas Fixas</h3>
           <ul id="fixed-container"></ul>
         </div>
       </section>
@@ -142,7 +153,6 @@
             <option value="current-month">Este Mês</option>
             <option value="last-month">Mês Anterior</option>
             <option value="last-3-months">Últimos 3 Meses</option>
-            <option value="current-year">Este Ano</option>
           </select>
         </div>
 
@@ -164,7 +174,6 @@
               <tr>
                 <th>Data</th>
                 <th>Descrição</th>
-                <th>Categoria</th>
                 <th>Valor</th>
                 <th>Saldo</th>
               </tr>
@@ -174,25 +183,6 @@
         </div>
       </section>
     </main>
-
-    <!-- Modal para Adicionar Categoria -->
-    <div id="category-modal" class="modal">
-      <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <h3>Adicionar Nova Categoria</h3>
-        <form id="category-form">
-          <div class="form-group">
-            <label for="new-category-name">Nome da Categoria</label>
-            <input type="text" id="new-category-name" required>
-          </div>
-          <div class="form-group">
-            <label for="new-category-color">Cor</label>
-            <input type="color" id="new-category-color" value="#3b82f6">
-          </div>
-          <button type="submit" class="btn-primary">Salvar Categoria</button>
-        </form>
-      </div>
-    </div>
   </div>
 
   <script src="script.js" type="module"></script>
