@@ -1,21 +1,16 @@
 {
-  "name": "Gestão Financeira Completa",
+  "name": "Gestão Financeira",
   "short_name": "Finanças",
-  "description": "Aplicativo completo para gestão financeira pessoal com controle de receitas, despesas e relatórios",
+  "description": "Aplicativo completo para gestão financeira pessoal",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f8fafc",
-  "theme_color": "#2563eb",
+  "background_color": "#0f172a",
+  "theme_color": "#3b82f6",
   "icons": [
     {
       "src": "icons/icon-96.png",
       "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "icons/icon-144.png",
-      "sizes": "144x144",
       "type": "image/png"
     },
     {
@@ -28,6 +23,5 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "categories": ["finance", "productivity"]
+  ]
 }
