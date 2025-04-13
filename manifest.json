@@ -1,21 +1,58 @@
-
 {
   "name": "Gestão Financeira",
   "short_name": "Finanças",
+  "description": "Aplicativo para gestão de finanças pessoais e controle de gastos",
   "start_url": "./index.html",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#2563eb",
+  "prefer_related_applications": false,
   "icons": [
+    {
+      "src": "icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "description": "Tela principal mostrando lançamentos financeiros"
+    }
+  ],
+  "categories": ["finance", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Adicionar Despesa",
+      "url": "./index.html#finance-section",
+      "description": "Registrar nova despesa"
+    },
+    {
+      "name": "Ver Lembretes",
+      "url": "./index.html#reminder-section",
+      "description": "Visualizar lembretes financeiros"
     }
   ]
 }
