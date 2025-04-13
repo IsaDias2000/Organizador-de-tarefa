@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -7,115 +8,55 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
   <meta name="theme-color" content="#2563eb" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <button id="install-button" style="display: none;">📲 Instalar App</button>
-
   <div class="container">
     <header>
       <h1>Gestão Financeira 💸</h1>
       <button id="theme-toggle">🌞 / 🌜</button>
     </header>
-
     <nav>
       <button id="finance-tab">Lançamentos 📋</button>
       <button id="payment-tab">Próxima Data 📅</button>
       <button id="reminder-tab">Lembretes 📌</button>
     </nav>
-
-    <!-- Aba: Lançamentos -->
     <section id="finance-section" class="tab-section active">
       <form id="finance-form">
         <input type="text" id="description" placeholder="Descrição" required />
-        <input type="text" id="amount" placeholder="Valor ex: 50,00" required />
-        <select id="category" required>
+        <input type="text" id="amount" placeholder="Valor" required />
+        <select id="type" required>
           <option value="receita">Receita</option>
           <option value="despesa">Despesa</option>
-          <select id="type" required>
-          <option value="receita">Receita ⤵</option>
-          <option value="despesa">Despesa ⤴</option>
-</select>
-
         </select>
-        <input type="text" id="type" placeholder="Categoria (ex: mercado)" required />
-        <label><input type="checkbox" id="fixed" /> Despesa fixa</label>
-        <label><input type="number" id="installments" min="1" placeholder="Parcelas (opcional)" /></label>
-        <button type="submit">Adicionar Lançamento</button>
+        <input type="text" id="category" placeholder="Categoria" required />
+        <label><input type="checkbox" id="fixed" /> Despesa Fixa</label>
+        <input type="number" id="installments" min="1" placeholder="Parcelas (opcional)" />
+        <button type="submit">Adicionar</button>
         <p id="feedback"></p>
       </form>
-
-      <p id="cashflow">Saldo Atual: R$ 0.00</p>
-      <p id="daily-expense">Gastos de Hoje: R$ 0.00</p>
-      <p id="fixed-expenses">Despesas Fixas: 0 itens • Total: R$ 0.00</p>
-      <p id="gasto-diario-info">Valor diário permitido: --</p>
-
       <ul id="transactions"></ul>
-      <div style="margin-bottom: 10px;">
-  <button id="filtro-fixas" style="padding: 6px 12px; border-radius: 8px; background: #7c3aed; color: white;">👁️ Mostrar apenas despesas fixas</button>
-</div>
-
-      <button id="clear-transactions">🧹 Limpar Todos os Lançamentos</button>
-
-      <canvas id="pieChart" width="400" height="200"></canvas>
-      <canvas id="barChart" width="400" height="200"></canvas>
+      <button id="clear-transactions">Limpar Tudo</button>
+      <canvas id="pieChart"></canvas>
+      <canvas id="barChart"></canvas>
     </section>
-
-    <!-- Aba: Data de Pagamento -->
     <section id="payment-section" class="tab-section">
       <form id="payment-form">
         <input type="date" id="next-payment" required />
-        <button type="submit">Salvar Data</button>
+        <button type="submit">Salvar</button>
       </form>
       <p id="payment-info">Nenhuma data definida.</p>
     </section>
-
-    <!-- Aba: Lembretes -->
     <section id="reminder-section" class="tab-section">
       <form id="reminder-form">
         <input type="text" id="reminder" placeholder="Adicionar lembrete" required />
         <button type="submit">Salvar</button>
       </form>
-      <h3>Lembretes Ativos:</h3>
       <ul id="reminders"></ul>
-      <h3>Completos ✅:</h3>
       <ul id="completed-reminders"></ul>
     </section>
   </div>
-
   <script src="script.js"></script>
-
-  <script>
-    // PWA install
-    let deferredPrompt;
-    const installBtn = document.getElementById("install-button");
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.style.display = "block";
-    });
-
-    installBtn.addEventListener("click", async () => {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === "accepted") {
-        console.log("✅ App instalado");
-      }
-      installBtn.style.display = "none";
-      deferredPrompt = null;
-    });
-
-    window.addEventListener("appinstalled", () => {
-      console.log("✅ App instalado com sucesso");
-    });
-
-    // Service Worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js').then(() => {
-        console.log("✅ SW registrado");
-      }).catch(console.error);
-    }
-  </script>
 </body>
 </html>
