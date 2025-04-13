@@ -1,193 +1,60 @@
-:root {
-  /* Cores existentes mantidas */
-  --primary: #2563eb;
-  --primary-dark: #1d4ed8;
-  --danger: #dc2626;
-  --success: #16a34a;
-  --warning: #d97706;
-  --text: #1e293b;
-  --bg: #f8fafc;
-  --bg-card: #ffffff;
-  --border: #e2e8f0;
-  --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --radius: 0.5rem;
-  --transition: all 0.2s ease;
-  
-  /* Novas cores */
-  --goal-complete: #16a34a;
-  --goal-progress: #3b82f6;
-  --goal-warning: #d97706;
-  --goal-danger: #dc2626;
-  --report-income: #16a34a;
-  --report-expense: #dc2626;
-}
-
-/* Estilos existentes mantidos */
-
-/* Novos estilos para as funcionalidades adicionadas */
-
-/* Filtros */
-.filters {
-  background: var(--bg-card);
-  padding: 1rem;
-  border-radius: var(--radius);
-  margin: 1rem 0;
-  box-shadow: var(--shadow);
-}
-
-.filter-group {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 0.5rem;
-  align-items: center;
-}
-
-/* Relatórios */
-.report-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.report-summary {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.summary-card {
-  padding: 1.5rem;
-  border-radius: var(--radius);
-  color: white;
-  text-align: center;
-}
-
-.summary-card.income {
-  background: var(--report-income);
-}
-
-.summary-card.expense {
-  background: var(--report-expense);
-}
-
-.summary-card.balance {
-  background: var(--primary);
-}
-
-.category-breakdown {
-  margin-top: 2rem;
-}
-
-/* Metas */
-.goals-list {
-  margin-top: 2rem;
-}
-
-.goal-card {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  padding: 1rem;
-  margin-bottom: 1rem;
-  box-shadow: var(--shadow);
-  border-left: 4px solid var(--goal-progress);
-  position: relative;
-}
-
-.goal-card.complete {
-  border-left-color: var(--goal-complete);
-}
-
-.goal-card.warning {
-  border-left-color: var(--goal-warning);
-}
-
-.goal-card.danger {
-  border-left-color: var(--goal-danger);
-}
-
-.goal-progress {
-  height: 8px;
-  background: var(--border);
-  border-radius: 4px;
-  margin: 0.5rem 0;
-  overflow: hidden;
-}
-
-.progress-bar {
-  height: 100%;
-  background: var(--goal-progress);
-  width: 0%;
-  transition: width 0.5s ease;
-}
-
-.goal-details {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-}
-
-.goal-actions {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-}
-
-/* Modal */
+/* Modal - Correções */
 .modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  /* ... estilos existentes ... */
+  backdrop-filter: blur(3px);
 }
 
 .modal-content {
-  background: var(--bg-card);
-  padding: 2rem;
-  border-radius: var(--radius);
-  width: min(90%, 600px);
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
+  /* ... estilos existentes ... */
+  pointer-events: auto; /* Permite interação com o conteúdo */
+}
+
+.modal-content > * {
+  pointer-events: none; /* Evita eventos nos elementos filhos */
+}
+
+.modal-content > * > * {
+  pointer-events: auto; /* Permite interação com elementos internos */
 }
 
 .close-modal {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  font-size: 1.5rem;
-  cursor: pointer;
+  /* ... estilos existentes ... */
+  background: var(--danger);
+  color: white;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
-/* Notificações */
-.notification-settings {
-  background: var(--bg-card);
-  padding: 1rem;
+.feedback-message {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: white;
+  padding: 10px 20px;
   border-radius: var(--radius);
-  margin-top: 2rem;
+  z-index: 1001;
+  animation: slideUp 0.3s ease;
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
-  .filter-group {
-    grid-template-columns: 1fr;
-  }
-  
-  .report-summary {
-    grid-template-columns: 1fr;
-  }
-  
-  .header-actions {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-  }
+@keyframes slideUp {
+  from { bottom: -50px; opacity: 0; }
+  to { bottom: 20px; opacity: 1; }
+}
+
+/* Melhorias no textarea */
+#data-json {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  font-family: monospace;
+  min-height: 200px;
+  resize: vertical;
 }
