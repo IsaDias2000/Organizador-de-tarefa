@@ -1,267 +1,92 @@
-// Módulo Principal (existente)
-class App {
-  constructor() {
-    this.initTabs();
-    this.initTheme();
-    this.registerServiceWorker();
-    this.initDataManager();
-    this.initModals();
-    this.initNotifications();
-    this.setCurrentYear();
-  }
+// No método initModals() da classe App, substitua por:
+initModals() {
+  this.modal = document.getElementById('data-modal');
+  this.modalTitle = document.getElementById('modal-title');
+  this.modalBody = document.getElementById('modal-body');
   
-  // Métodos existentes mantidos...
+  document.getElementById('export-data').addEventListener('click', () => {
+    this.showExportModal();
+  });
   
-  // Novos métodos
-  initDataManager() {
-    this.dataManager = new DataManager();
-    this.financeManager = new FinanceManager(this.dataManager);
-    this.reportManager = new ReportManager(this.dataManager);
-    this.goalManager = new GoalManager(this.dataManager);
-    this.reminderManager = new ReminderManager(this.dataManager);
-  }
+  document.getElementById('import-data').addEventListener('click', () => {
+    this.showImportModal();
+  });
   
-  initModals() {
-    this.modal = document.getElementById('data-modal');
-    this.modalTitle = document.getElementById('modal-title');
-    this.modalBody = document.getElementById('modal-body');
-    
-    document.getElementById('export-data').addEventListener('click', () => {
-      this.showExportModal();
-    });
-    
-    document.getElementById('import-data').addEventListener('click', () => {
-      this.showImportModal();
-    });
-    
-    document.querySelector('.close-modal').addEventListener('click', () => {
+  // Correção: Adicionar evento de clique no overlay para fechar
+  this.modal.addEventListener('click', (e) => {
+    if (e.target === this.modal || e.target.classList.contains('close-modal')) {
       this.closeModal();
-    });
-  }
-  
-  showExportModal() {
-    this.modalTitle.textContent = 'Exportar Dados';
-    this.modalBody.querySelector('textarea').value = this.dataManager.exportData();
-    this.modalBody.hidden = false;
-    this.modalBody.querySelector('#import-actions').hidden = true;
-    this.modal.hidden = false;
-  }
-  
-  showImportModal() {
-    this.modalTitle.textContent = 'Importar Dados';
-    this.modalBody.hidden = true;
-    this.modalBody.querySelector('#import-actions').hidden = false;
-    this.modal.hidden = false;
-  }
-  
-  closeModal() {
-    this.modal.hidden = true;
-  }
-  
-  initNotifications() {
-    if ('Notification' in window) {
-      document.getElementById('request-permission').addEventListener('click', () => {
-        Notification.requestPermission().then(permission => {
-          if (permission === 'granted') {
-            alert('Notificações ativadas com sucesso!');
-          }
-        });
-      });
     }
-  }
+  });
   
-  setCurrentYear() {
-    document.getElementById('current-year').textContent = new Date().getFullYear();
-  }
+  // Adicionar evento de tecla ESC para fechar
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !this.modal.hidden) {
+      this.closeModal();
+    }
+  });
+  
+  // Configurar botão de cópia
+  document.getElementById('copy-data').addEventListener('click', () => {
+    const textarea = document.getElementById('data-json');
+    textarea.select();
+    document.execCommand('copy');
+    this.showFeedback('Dados copiados para a área de transferência!');
+  });
+  
+  // Configurar botão de download
+  document.getElementById('download-data').addEventListener('click', () => {
+    this.downloadData();
+  });
+  
+  // Configurar importação
+  document.getElementById('confirm-import').addEventListener('click', () => {
+    this.importData();
+  });
 }
 
-// Novo: Gerenciador de Dados Centralizado
-class DataManager {
-  constructor() {
-    this.loadData();
-  }
+// Adicionar novos métodos auxiliares:
+showFeedback(message) {
+  const feedback = document.createElement('div');
+  feedback.className = 'feedback-message';
+  feedback.textContent = message;
+  document.body.appendChild(feedback);
   
-  loadData() {
-    this.transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-    this.goals = JSON.parse(localStorage.getItem('goals')) || [];
-    this.reminders = JSON.parse(localStorage.getItem('reminders')) || [];
-    this.settings = JSON.parse(localStorage.getItem('settings')) || {
-      notificationsEnabled: false,
-      notificationTime: '18:00'
-    };
-  }
-  
-  saveData() {
-    localStorage.setItem('transactions', JSON.stringify(this.transactions));
-    localStorage.setItem('goals', JSON.stringify(this.goals));
-    localStorage.setItem('reminders', JSON.stringify(this.reminders));
-    localStorage.setItem('settings', JSON.stringify(this.settings));
-  }
-  
-  exportData() {
-    return JSON.stringify({
-      transactions: this.transactions,
-      goals: this.goals,
-      reminders: this.reminders,
-      settings: this.settings,
-      version: '2.0',
-      exportedAt: new Date().toISOString()
-    }, null, 2);
-  }
-  
-  importData(data) {
-    try {
-      const parsed = JSON.parse(data);
-      if (parsed.transactions) this.transactions = parsed.transactions;
-      if (parsed.goals) this.goals = parsed.goals;
-      if (parsed.reminders) this.reminders = parsed.reminders;
-      if (parsed.settings) this.settings = parsed.settings;
-      this.saveData();
-      return true;
-    } catch (e) {
-      console.error('Erro ao importar dados:', e);
-      return false;
-    }
-  }
+  setTimeout(() => {
+    feedback.remove();
+  }, 3000);
 }
 
-// Módulo de Finanças (atualizado)
-class FinanceManager {
-  constructor(dataManager) {
-    this.dataManager = dataManager;
-    this.initForm();
-    this.initFilters();
-    this.renderTransactions();
-    this.initCharts();
-  }
+downloadData() {
+  const data = document.getElementById('data-json').value;
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
   
-  // Métodos existentes atualizados para usar dataManager...
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `backup-financas-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
   
-  // Novos métodos para filtros
-  initFilters() {
-    this.updateCategoryFilter();
-    
-    document.getElementById('apply-filters').addEventListener('click', () => {
-      this.applyFilters();
-    });
-    
-    document.getElementById('clear-filters').addEventListener('click', () => {
-      this.clearFilters();
-    });
-  }
-  
-  applyFilters() {
-    const type = document.getElementById('filter-type').value;
-    const category = document.getElementById('filter-category').value;
-    const month = document.getElementById('filter-month').value;
-    
-    let filtered = this.dataManager.transactions;
-    
-    if (type !== 'all') {
-      filtered = filtered.filter(t => t.type === type);
-    }
-    
-    if (category !== 'all') {
-      filtered = filtered.filter(t => t.category === category);
-    }
-    
-    if (month) {
-      filtered = filtered.filter(t => {
-        const date = new Date(t.date);
-        return date.getFullYear() === parseInt(month.split('-')[0]) && 
-               date.getMonth() + 1 === parseInt(month.split('-')[1]);
-      });
-    }
-    
-    this.renderTransactions(filtered);
-  }
-  
-  clearFilters() {
-    document.getElementById('filter-type').value = 'all';
-    document.getElementById('filter-category').value = 'all';
-    document.getElementById('filter-month').value = '';
-    this.renderTransactions(this.dataManager.transactions);
-  }
-  
-  updateCategoryFilter() {
-    const select = document.getElementById('filter-category');
-    const categories = [...new Set(this.dataManager.transactions.map(t => t.category))];
-    
-    // Mantém 'all' e remove outras opções
-    while (select.options.length > 1) {
-      select.remove(1);
-    }
-    
-    categories.forEach(category => {
-      const option = document.createElement('option');
-      option.value = category;
-      option.textContent = category;
-      select.appendChild(option);
-    });
-  }
+  URL.revokeObjectURL(url);
+  this.showFeedback('Download iniciado!');
 }
 
-// Novo: Módulo de Relatórios
-class ReportManager {
-  constructor(dataManager) {
-    this.dataManager = dataManager;
-    this.initCharts();
-    this.updateReport();
-    
-    document.getElementById('report-period').addEventListener('change', () => {
-      this.updateReport();
-    });
-  }
+async importData() {
+  const fileInput = document.getElementById('file-input');
+  if (!fileInput.files.length) return;
   
-  updateReport() {
-    const period = document.getElementById('report-period').value;
-    let transactions = [];
-    
-    switch (period) {
-      case 'current-month':
-        transactions = this.getCurrentMonthTransactions();
-        break;
-      case 'last-month':
-        transactions = this.getLastMonthTransactions();
-        break;
-      case 'last-3-months':
-        transactions = this.getLastThreeMonthsTransactions();
-        break;
-      default:
-        transactions = this.dataManager.transactions;
+  const file = fileInput.files[0];
+  try {
+    const data = await file.text();
+    if (this.dataManager.importData(data)) {
+      this.showFeedback('Dados importados com sucesso!');
+      this.closeModal();
+      location.reload(); // Recarregar para aplicar os novos dados
+    } else {
+      this.showFeedback('Erro ao importar dados. Verifique o arquivo.');
     }
-    
-    this.updateSummary(transactions);
-    this.updateCharts(transactions);
+  } catch (error) {
+    console.error('Erro na importação:', error);
+    this.showFeedback('Falha ao ler arquivo.');
   }
-  
-  // Métodos para cálculos de relatórios...
 }
-
-// Novo: Módulo de Metas
-class GoalManager {
-  constructor(dataManager) {
-    this.dataManager = dataManager;
-    this.initForm();
-    this.renderGoals();
-  }
-  
-  // Métodos para gerenciamento de metas...
-}
-
-// Módulo de Lembretes (atualizado)
-class ReminderManager {
-  constructor(dataManager) {
-    this.dataManager = dataManager;
-    this.initForm();
-    this.renderReminders();
-    this.initNotificationSettings();
-  }
-  
-  // Métodos atualizados e novos para notificações...
-}
-
-// Inicialização da aplicação
-document.addEventListener('DOMContentLoaded', () => {
-  new App();
-});
