@@ -1,55 +1,21 @@
+
 {
-  "id": "/Organizador-de-tarefa/",
   "name": "Gestão Financeira",
   "short_name": "Finanças",
-  "description": "Organize seus lançamentos, lembretes e metas financeiras de forma simples e intuitiva.",
-  "start_url": "/Organizador-de-tarefa/",
-  "scope": "/Organizador-de-tarefa/",
+  "start_url": "./index.html",
   "display": "standalone",
-  "orientation": "portrait",
-  "lang": "pt-BR",
-  "dir": "ltr",
   "background_color": "#ffffff",
   "theme_color": "#2563eb",
-  "categories": ["finance", "productivity", "utilities"],
   "icons": [
     {
-      "src": "/Organizador-de-tarefa/icons/icon-192.png",
+      "src": "icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png"
     },
     {
-      "src": "/Organizador-de-tarefa/icons/icon-512.png",
+      "src": "icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable any"
+      "type": "image/png"
     }
-  ],
-  "screenshots": [
-    {
-      "src": "/Organizador-de-tarefa/screenshots/screenshot1.png",
-      "sizes": "640x480",
-      "type": "image/png",
-      "label": "Tela de lançamentos financeiros"
-    },
-    {
-      "src": "/Organizador-de-tarefa/screenshots/screenshot2.png",
-      "sizes": "640x480",
-      "type": "image/png",
-      "label": "Lembretes e metas"
-    }
-  ],
-  "launch_handler": {
-    "client_mode": "navigate-existing"
-  },
-  "prefer_related_applications": false,
-  "related_applications": [],
-  "scope_extensions": [],
-  "iarc_rating_id": "",
-  "background_sync": {
-    "periodic_sync": {
-      "min_interval": 1440
-    }
-  }
+  ]
 }
