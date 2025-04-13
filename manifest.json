@@ -1,7 +1,7 @@
 {
-  "name": "Gestão Financeira",
-  "short_name": "Finanças",
-  "description": "Aplicativo para gestão de finanças pessoais e controle de gastos",
+  "name": "Gestão Financeira Pro",
+  "short_name": "Finanças Pro",
+  "description": "Aplicativo completo para gestão financeira pessoal com controle de gastos, receitas, metas e relatórios",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
@@ -40,19 +40,37 @@
       "sizes": "1280x720",
       "type": "image/png",
       "description": "Tela principal mostrando lançamentos financeiros"
+    },
+    {
+      "src": "screenshots/screenshot2.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "description": "Relatório financeiro mensal"
     }
   ],
   "categories": ["finance", "productivity"],
   "shortcuts": [
     {
-      "name": "Adicionar Despesa",
+      "name": "Adicionar Transação",
       "url": "./index.html#finance-section",
-      "description": "Registrar nova despesa"
+      "description": "Registrar nova receita ou despesa"
     },
     {
-      "name": "Ver Lembretes",
-      "url": "./index.html#reminder-section",
-      "description": "Visualizar lembretes financeiros"
+      "name": "Ver Relatório",
+      "url": "./index.html#report-section",
+      "description": "Visualizar relatórios financeiros"
+    },
+    {
+      "name": "Minhas Metas",
+      "url": "./index.html#goals-section",
+      "description": "Acompanhar metas financeiras"
     }
+  ],
+  "features": [
+    "Transações financeiras",
+    "Relatórios detalhados",
+    "Metas financeiras",
+    "Lembretes inteligentes",
+    "Sincronização entre dispositivos"
   ]
 }
