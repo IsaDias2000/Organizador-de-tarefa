@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gestao-financeira-v2';
+const CACHE_NAME = 'gestao-financeira-v3';
 const ASSETS = [
   '/',
   '/index.html',
@@ -6,10 +6,10 @@ const ASSETS = [
   '/script.js',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
-  'https://cdn.jsdelivr.net/npm/chart.js'
+  'https://cdn.jsdelivr.net/npm/chart.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
-// Evento de instalação
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -18,7 +18,6 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Evento de ativação
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -30,33 +29,9 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Estratégia de cache (Cache First, Network Fallback)
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
       .then((response) => response || fetch(event.request))
-  );
-});
-
-// Push notifications
-self.addEventListener('push', (event) => {
-  const data = event.data.json();
-  const options = {
-    body: data.body,
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-96.png',
-    vibrate: [200, 100, 200],
-    data: { url: data.url }
-  };
-
-  event.waitUntil(
-    self.registration.showNotification(data.title, options)
-  );
-});
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  event.waitUntil(
-    clients.openWindow(event.notification.data.url)
   );
 });
