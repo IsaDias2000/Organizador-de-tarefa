@@ -20,13 +20,7 @@ class FinanceApp {
 
   initElements() {
     this.elements = {
-      // Formulários
       transactionForm: document.getElementById('transaction-form'),
-      reminderForm: document.getElementById('reminder-form'),
-      categoryForm: document.getElementById('category-form'),
-      goalForm: document.getElementById('goal-form'),
-      
-      // Inputs
       transactionType: document.getElementById('transaction-type'),
       transactionDate: document.getElementById('transaction-date'),
       transactionDescription: document.getElementById('transaction-description'),
@@ -37,76 +31,29 @@ class FinanceApp {
       transactionParceled: document.getElementById('transaction-parceled'),
       transactionInstallments: document.getElementById('transaction-installments'),
       transactionFixed: document.getElementById('transaction-fixed'),
-      reminderDescription: document.getElementById('reminder-description'),
-      newCategoryName: document.getElementById('new-category-name'),
-      newCategoryColor: document.getElementById('new-category-color'),
-      goalName: document.getElementById('goal-name'),
-      goalTarget: document.getElementById('goal-target'),
-      goalDeadline: document.getElementById('goal-deadline'),
-      goalInitial: document.getElementById('goal-initial'),
-      
-      // Containers
       transactionsContainer: document.getElementById('transactions-container'),
       fixedContainer: document.getElementById('fixed-container'),
       activeReminders: document.getElementById('active-reminders'),
       completedReminders: document.getElementById('completed-reminders'),
       goalsContainer: document.getElementById('goals-container'),
       cashFlowBody: document.getElementById('cash-flow-body'),
-      netWorthReport: document.getElementById('net-worth-report'),
-      
-      // Filtros
       filterType: document.getElementById('filter-type'),
       filterCategory: document.getElementById('filter-category'),
       filterStatus: document.getElementById('filter-status'),
       filterMonth: document.getElementById('filter-month'),
       clearFilters: document.getElementById('clear-filters'),
-      filterFixedType: document.getElementById('filter-fixed-type'),
-      filterFixedStatus: document.getElementById('filter-fixed-status'),
-      filterFixedCategory: document.getElementById('filter-fixed-category'),
-      
-      // Relatórios
-      reportPeriodSelect: document.getElementById('report-period-select'),
-      
-      // Sumários
       currentBalance: document.getElementById('current-balance'),
       totalIncome: document.getElementById('total-income'),
       totalExpenses: document.getElementById('total-expenses'),
-      fixedExpensesSummary: document.getElementById('fixed-expenses-summary'),
-      parceledExpensesSummary: document.getElementById('parceled-expenses-summary'),
-      pendingPaymentsSummary: document.getElementById('pending-payments-summary'),
-      fixedIncomeSummary: document.getElementById('fixed-income-summary'),
-      fixedExpenseSummary: document.getElementById('fixed-expense-summary'),
-      totalGoals: document.getElementById('total-goals'),
-      completedGoals: document.getElementById('completed-goals'),
-      inProgressGoals: document.getElementById('in-progress-goals'),
-      
-      // Botões
       addCategoryBtn: document.getElementById('add-category-btn'),
       clearTransactions: document.getElementById('clear-transactions'),
-      clearCompleted: document.getElementById('clear-completed'),
-      confirmClear: document.getElementById('confirm-clear'),
-      cancelClear: document.getElementById('cancel-clear'),
-      updateCalculation: document.getElementById('update-calculation'),
-      
-      // Tabs
       tabButtons: document.querySelectorAll('.tab-button'),
       tabContents: document.querySelectorAll('.tab-content'),
-      
-      // Gráficos
-      balanceChart: document.getElementById('balance-chart'),
-      categoriesChart: document.getElementById('categories-chart'),
-      monthlyTrendChart: document.getElementById('monthly-trend-chart'),
-      
-      // Modais
-      confirmClearModal: document.getElementById('confirm-clear-modal'),
-      categoryModal: document.getElementById('category-modal'),
-      closeModal: document.querySelector('.close-modal')
+      updateCalculation: document.getElementById('update-calculation')
     };
 
-    // Configura data padrão
     const today = new Date();
     this.elements.transactionDate.value = today.toISOString().split('T')[0];
-    this.elements.goalDeadline.value = today.toISOString().split('T')[0];
   }
 
   loadData() {
@@ -115,9 +62,7 @@ class FinanceApp {
     this.categories = JSON.parse(localStorage.getItem('categories')) || [
       { name: 'Alimentação', color: '#ef4444' },
       { name: 'Moradia', color: '#3b82f6' },
-      { name: 'Transporte', color: '#10b981' },
-      { name: 'Lazer', color: '#f59e0b' },
-      { name: 'Salário', color: '#8b5cf6' }
+      { name: 'Transporte', color: '#10b981' }
     ];
     this.reminders = JSON.parse(localStorage.getItem('reminders')) || [];
     this.goals = JSON.parse(localStorage.getItem('goals')) || [];
@@ -145,81 +90,36 @@ class FinanceApp {
       this.addTransaction();
     });
 
-    // Formulário de lembrete
-    this.elements.reminderForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      this.addReminder();
-    });
-
-    // Formulário de categoria
-    this.elements.categoryForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      this.addCategory();
-    });
-
-    // Formulário de meta
-    this.elements.goalForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      this.addGoal();
-    });
-
     // Parcelamento
     this.elements.transactionParceled.addEventListener('change', (e) => {
       this.elements.transactionInstallments.disabled = !e.target.checked;
     });
 
-    // Botão para adicionar categoria
-    this.elements.addCategoryBtn.addEventListener('click', () => {
-      this.elements.categoryModal.classList.add('active');
-    });
-
-    // Botão para limpar transações
-    this.elements.clearTransactions.addEventListener('click', () => {
-      this.elements.confirmClearModal.classList.add('active');
-    });
-
-    // Confirmação para limpar transações
-    this.elements.confirmClear.addEventListener('click', () => {
-      this.clearAllTransactions();
-      this.elements.confirmClearModal.classList.remove('active');
-    });
-
-    // Cancelar limpeza
-    this.elements.cancelClear.addEventListener('click', () => {
-      this.elements.confirmClearModal.classList.remove('active');
-    });
-
-    // Botão para limpar lembretes concluídos
-    this.elements.clearCompleted.addEventListener('click', () => {
-      this.clearCompletedReminders();
-    });
-
-    // Fechar modais
-    this.elements.closeModal.addEventListener('click', () => {
-      this.elements.categoryModal.classList.remove('active');
-    });
-
-    // Fecha modal ao clicar fora
-    document.querySelectorAll('.modal').forEach(modal => {
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-          modal.classList.remove('active');
-        }
-      });
-    });
-
-    // Atualizar cálculo diário
+    // Botão para atualizar cálculo
     this.elements.updateCalculation.addEventListener('click', () => {
       this.calculateDailyBudget();
     });
 
-    // Verifica vencimentos a cada hora
+    // Filtros
+    this.elements.filterType.addEventListener('change', () => this.filterTransactions());
+    this.elements.filterCategory.addEventListener('change', () => this.filterTransactions());
+    this.elements.filterStatus.addEventListener('change', () => this.filterTransactions());
+    this.elements.filterMonth.addEventListener('change', () => this.filterTransactions());
+    this.elements.clearFilters.addEventListener('click', () => this.clearFilters());
+
+    // Verifica vencimentos periodicamente
     setInterval(() => this.checkDueDates(), 60 * 60 * 1000);
   }
 
-  // ... (Todas as outras funções implementadas anteriormente) ...
+  switchTab(button) {
+    this.elements.tabButtons.forEach(btn => btn.classList.remove('active'));
+    this.elements.tabContents.forEach(content => content.classList.remove('active'));
+    
+    button.classList.add('active');
+    const tabId = button.getAttribute('data-tab');
+    document.getElementById(tabId).classList.add('active');
+  }
 
-  // FUNÇÃO PARA ADICIONAR TRANSAÇÃO (COMPLETA)
   addTransaction() {
     const type = this.elements.transactionType.value;
     const date = this.elements.transactionDate.value;
@@ -231,7 +131,6 @@ class FinanceApp {
     const installments = isParceled ? parseInt(this.elements.transactionInstallments.value) : 1;
     const isFixed = this.elements.transactionFixed.checked;
 
-    // Validação
     if (!description || isNaN(amount)) {
       alert('Preencha todos os campos obrigatórios!');
       return;
@@ -253,7 +152,6 @@ class FinanceApp {
       createdAt: new Date().toISOString()
     };
 
-    // Adiciona parcelas se necessário
     if (isParceled && installments > 1) {
       this.addInstallments(newTransaction, installments);
     }
@@ -271,23 +169,21 @@ class FinanceApp {
     this.renderAll();
     this.elements.transactionForm.reset();
     
-    // Atualiza cálculo diário se for despesa
-    if (type === 'expense') {
-      this.calculateDailyBudget();
-    }
+    // Reset para data atual
+    this.elements.transactionDate.value = new Date().toISOString().split('T')[0];
   }
 
   addInstallments(baseTransaction, installments) {
     const baseDate = new Date(baseTransaction.date);
     const baseDueDate = baseTransaction.dueDate ? new Date(baseTransaction.dueDate) : baseDate;
-
+    
     for (let i = 2; i <= installments; i++) {
       const installmentDate = new Date(baseDate);
       installmentDate.setMonth(baseDate.getMonth() + (i - 1));
       
       const installmentDueDate = new Date(baseDueDate);
       installmentDueDate.setMonth(baseDueDate.getMonth() + (i - 1));
-
+      
       const installment = {
         ...baseTransaction,
         id: Date.now() + i,
@@ -296,12 +192,84 @@ class FinanceApp {
         installmentNumber: i,
         paid: false
       };
-
+      
       this.transactions.push(installment);
     }
   }
 
-  // FUNÇÃO PARA CALCULAR GASTOS DIÁRIOS (COMPLETA)
+  renderTransactions(transactions) {
+    this.elements.transactionsContainer.innerHTML = '';
+    
+    transactions.forEach(transaction => {
+      const li = document.createElement('li');
+      li.className = `transaction-item ${transaction.type} ${transaction.status} ${transaction.paid ? 'paid' : ''}`;
+      
+      let dueBadge = '';
+      if (transaction.dueDate && !transaction.paid) {
+        const dueDate = new Date(transaction.dueDate);
+        const today = new Date();
+        const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+        
+        if (daysUntilDue <= 3 && daysUntilDue >= 0) {
+          dueBadge = `<span class="due-badge due-soon" title="Vence em ${daysUntilDue} dias"><i class="fas fa-exclamation-circle"></i></span>`;
+        } else if (daysUntilDue < 0) {
+          dueBadge = `<span class="due-badge due-late" title="Vencido há ${Math.abs(daysUntilDue)} dias"><i class="fas fa-exclamation-triangle"></i></span>`;
+        }
+      }
+      
+      li.innerHTML = `
+        <div class="transaction-info">
+          <div class="transaction-description">
+            ${transaction.description}
+            ${dueBadge}
+          </div>
+          <div class="transaction-meta">
+            <span>${new Date(transaction.date).toLocaleDateString()}</span>
+            ${transaction.category ? `<span>${transaction.category}</span>` : ''}
+            ${transaction.installments > 1 ? `<span>Parcela ${transaction.installmentNumber}/${transaction.installments}</span>` : ''}
+          </div>
+        </div>
+        <div class="transaction-amount ${transaction.type}">
+          ${transaction.type === 'expense' ? '-' : ''}R$ ${Math.abs(transaction.amount).toFixed(2)}
+        </div>
+      `;
+      
+      this.elements.transactionsContainer.appendChild(li);
+    });
+  }
+
+  filterTransactions() {
+    const type = this.elements.filterType.value;
+    const category = this.elements.filterCategory.value;
+    const status = this.elements.filterStatus.value;
+    const month = this.elements.filterMonth.value;
+    
+    let filtered = [...this.transactions];
+    
+    if (type !== 'all') filtered = filtered.filter(t => t.type === type);
+    if (category !== 'all') filtered = filtered.filter(t => t.category === category);
+    
+    if (status === 'fixed') {
+      filtered = filtered.filter(t => t.fixed);
+    } else if (status === 'parceled') {
+      filtered = filtered.filter(t => t.installments > 1);
+    } else if (status === 'pending') {
+      filtered = filtered.filter(t => !t.paid);
+    }
+    
+    if (month) {
+      const [year, monthNum] = month.split('-');
+      filtered = filtered.filter(t => {
+        const date = new Date(t.date);
+        return date.getFullYear() === parseInt(year) && 
+               date.getMonth() + 1 === parseInt(monthNum);
+      });
+    }
+    
+    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+    this.renderTransactions(filtered);
+  }
+
   calculateDailyBudget() {
     const paydayInput = this.elements.transactionPayday;
     if (!paydayInput.value) {
@@ -313,98 +281,82 @@ class FinanceApp {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Calcular dias restantes
     const timeDiff = payday - today;
-    const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-
-    if (daysRemaining <= 0) {
-      alert("A data de pagamento deve ser futura!");
-      return;
-    }
-
-    // Calcular orçamento diário
+    const daysRemaining = Math.max(Math.ceil(timeDiff / (1000 * 60 * 60 * 24)), 1);
     const dailyBudget = this.currentBalance / daysRemaining;
 
-    // Calcular gasto médio diário (últimos 30 dias)
-    const lastMonthExpenses = this.transactions
-      .filter(t => t.type === 'expense' && new Date(t.date) >= new Date(today.setMonth(today.getMonth() - 1)))
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-
-    const averageDailySpending = lastMonthExpenses / 30;
-
-    // Atualizar UI
     document.getElementById('days-until-payday').textContent = daysRemaining;
     document.getElementById('daily-budget').textContent = `R$ ${dailyBudget.toFixed(2)}`;
-    document.getElementById('average-daily-spending').textContent = `R$ ${averageDailySpending.toFixed(2)}`;
-
-    // Alerta se gasto médio excede o orçamento
-    if (averageDailySpending > dailyBudget) {
-      this.showNotification('Atenção!', 'Seu gasto médio está acima do orçamento diário recomendado.');
-    }
   }
 
-  // ... (Todas as outras funções necessárias) ...
-
-  // FUNÇÃO PARA VERIFICAR VENCIMENTOS (COMPLETA)
   checkDueDates() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    let hasOverdue = false;
-
     this.transactions.forEach(transaction => {
-      if (transaction.dueDate && !transaction.paid) {
+      if (transaction.dueDate) {
         const dueDate = new Date(transaction.dueDate);
-        if (dueDate < today) {
+        if (dueDate < today && !transaction.paid) {
           transaction.status = 'pendente';
-          hasOverdue = true;
         }
       }
     });
-
-    if (hasOverdue) {
-      this.showNotification('Contas vencidas!', 'Você tem transações pendentes de pagamento.');
-    }
-
+    
     this.saveData();
     this.renderAll();
   }
 
-  // FUNÇÃO PARA MOSTRAR NOTIFICAÇÕES
-  showNotification(title, message) {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification(title, { body: message });
-    } else if ('Notification' in window && Notification.permission !== 'denied') {
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          new Notification(title, { body: message });
-        }
-      });
-    }
+  updateBalance() {
+    const income = this.transactions
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    
+    const expenses = this.transactions
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    
+    this.currentBalance = income - expenses;
+    
+    this.elements.totalIncome.textContent = `R$ ${income.toFixed(2)}`;
+    this.elements.totalExpenses.textContent = `R$ ${expenses.toFixed(2)}`;
+    this.elements.currentBalance.textContent = `R$ ${this.currentBalance.toFixed(2)}`;
+    this.elements.currentBalance.style.color = this.currentBalance >= 0 ? 'var(--success)' : 'var(--danger)';
   }
 
-  // ... (Implemente todas as outras funções necessárias) ...
+  updateCategoriesDropdowns() {
+    this.elements.transactionCategory.innerHTML = '<option value="">Sem categoria</option>';
+    this.elements.filterCategory.innerHTML = '<option value="all">Todas Categorias</option>';
+    
+    this.categories.forEach(category => {
+      const option = document.createElement('option');
+      option.value = category.name;
+      option.textContent = category.name;
+      option.style.color = category.color;
+      this.elements.transactionCategory.appendChild(option);
+      
+      const filterOption = document.createElement('option');
+      filterOption.value = category.name;
+      filterOption.textContent = category.name;
+      this.elements.filterCategory.appendChild(filterOption);
+    });
+  }
 
-  // FUNÇÃO PARA RENDERIZAR TODOS OS COMPONENTES
+  clearFilters() {
+    this.elements.filterType.value = 'all';
+    this.elements.filterCategory.value = 'all';
+    this.elements.filterStatus.value = 'all';
+    this.elements.filterMonth.value = '';
+    this.filterTransactions();
+  }
+
   renderAll() {
     this.updateCategoriesDropdowns();
     this.filterTransactions();
-    this.filterFixedTransactions();
     this.updateBalance();
-    this.updateCashFlow();
-    this.updateReports();
-    this.renderReminders();
-    this.renderGoals();
-    this.updateGoalsSummary();
+    this.calculateDailyBudget();
   }
 }
 
-// Inicializa a aplicação
 document.addEventListener('DOMContentLoaded', () => {
   const app = new FinanceApp();
-  
-  // Solicita permissão para notificações
-  if ('Notification' in window) {
-    Notification.requestPermission();
-  }
 });
