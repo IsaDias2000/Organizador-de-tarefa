@@ -1,16 +1,19 @@
 {
-  "name": "Gestão Financeira",
-  "short_name": "Finanças",
-  "description": "Aplicativo completo para gestão financeira pessoal",
-  "start_url": "./index.html",
+  "name": "Gestão Financeira Pessoal",
+  "short_name": "Minhas Finanças",
+  "description": "Controle completo de receitas, despesas, metas e investimentos pessoais",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0f172a",
   "theme_color": "#3b82f6",
+  "categories": ["finance", "business", "utilities"],
+  "lang": "pt-BR",
   "icons": [
     {
-      "src": "icons/icon-96.png",
-      "sizes": "96x96",
+      "src": "icons/icon-72.png",
+      "sizes": "72x72",
       "type": "image/png"
     },
     {
@@ -22,6 +25,22 @@
       "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Adicionar Receita",
+      "short_name": "Receita",
+      "description": "Registrar nova receita",
+      "url": "/?action=add-income",
+      "icons": [{ "src": "icons/income-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Adicionar Despesa",
+      "short_name": "Despesa",
+      "description": "Registrar nova despesa",
+      "url": "/?action=add-expense",
+      "icons": [{ "src": "icons/expense-96.png", "sizes": "96x96" }]
     }
   ]
 }
