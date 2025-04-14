@@ -258,18 +258,12 @@ form {
   border-left-color: var(--purple);
 }
 
-.transaction-item.paid {
-  opacity: 0.7;
+.transaction-item.parceled {
+  border-left-color: var(--warning);
 }
 
-.transaction-item.parceled::after {
-  content: 'PARCELADO';
-  background: var(--warning);
-  color: var(--bg);
-  font-size: 0.7rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 1rem;
-  margin-left: 0.5rem;
+.transaction-item.paid {
+  opacity: 0.7;
 }
 
 .transaction-info {
@@ -300,32 +294,24 @@ form {
   color: var(--danger);
 }
 
-/* Gráficos e relatórios */
-.charts-container {
-  display: grid;
-  gap: 1rem;
-  margin: 1.5rem 0;
+/* Fluxo de Caixa */
+.cash-flow {
+  margin-top: 2rem;
 }
 
-.chart-card {
-  background: var(--bg);
-  padding: 1rem;
-  border-radius: var(--radius);
-}
-
-table {
+#cash-flow-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
 }
 
-th, td {
+#cash-flow-table th,
+#cash-flow-table td {
   padding: 0.75rem;
   text-align: left;
   border-bottom: 1px solid var(--border);
 }
 
-th {
+#cash-flow-table th {
   font-weight: 600;
   color: var(--text-light);
   font-size: 0.9rem;
@@ -337,6 +323,33 @@ th {
 
 .expense-row {
   color: var(--danger);
+}
+
+.parceled-row {
+  color: var(--warning);
+}
+
+.fixed-row {
+  color: var(--purple);
+}
+
+/* Gráficos */
+.charts-container {
+  display: grid;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+@media (min-width: 768px) {
+  .charts-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.chart-card {
+  background: var(--bg);
+  padding: 1rem;
+  border-radius: var(--radius);
 }
 
 /* Responsividade */
