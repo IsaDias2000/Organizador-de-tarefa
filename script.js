@@ -3,6 +3,7 @@ class FinanceApp {
     this.transactions = [];
     this.fixedTransactions = [];
     this.categories = [];
+    this.reminders = [];
     this.currentBalance = 0;
     
     this.initElements();
@@ -14,7 +15,12 @@ class FinanceApp {
   initElements() {
     // Elementos do DOM
     this.elements = {
+      // Formulários
       transactionForm: document.getElementById('transaction-form'),
+      reminderForm: document.getElementById('reminder-form'),
+      categoryForm: document.getElementById('category-form'),
+      
+      // Inputs
       transactionType: document.getElementById('transaction-type'),
       transactionDate: document.getElementById('transaction-date'),
       transactionDescription: document.getElementById('transaction-description'),
@@ -23,25 +29,59 @@ class FinanceApp {
       transactionParceled: document.getElementById('transaction-parceled'),
       transactionInstallments: document.getElementById('transaction-installments'),
       transactionFixed: document.getElementById('transaction-fixed'),
+      reminderDescription: document.getElementById('reminder-description'),
+      newCategoryName: document.getElementById('new-category-name'),
+      newCategoryColor: document.getElementById('new-category-color'),
+      
+      // Containers
       transactionsContainer: document.getElementById('transactions-container'),
       fixedContainer: document.getElementById('fixed-container'),
+      activeReminders: document.getElementById('active-reminders'),
+      completedReminders: document.getElementById('completed-reminders'),
       cashFlowBody: document.getElementById('cash-flow-body'),
+      
+      // Filtros
       filterType: document.getElementById('filter-type'),
       filterCategory: document.getElementById('filter-category'),
       filterStatus: document.getElementById('filter-status'),
       filterMonth: document.getElementById('filter-month'),
       clearFilters: document.getElementById('clear-filters'),
+      filterFixedType: document.getElementById('filter-fixed-type'),
       filterFixedStatus: document.getElementById('filter-fixed-status'),
       filterFixedCategory: document.getElementById('filter-fixed-category'),
+      
+      // Relatórios
       reportPeriodSelect: document.getElementById('report-period-select'),
+      
+      // Sumários
       currentBalance: document.getElementById('current-balance'),
       totalIncome: document.getElementById('total-income'),
       totalExpenses: document.getElementById('total-expenses'),
+      fixedExpensesSummary: document.getElementById('fixed-expenses-summary'),
+      parceledExpensesSummary: document.getElementById('parceled-expenses-summary'),
+      fixedIncomeSummary: document.getElementById('fixed-income-summary'),
+      fixedExpenseSummary: document.getElementById('fixed-expense-summary'),
+      
+      // Botões
       themeToggle: document.getElementById('theme-toggle'),
+      addCategoryBtn: document.getElementById('add-category-btn'),
+      clearTransactions: document.getElementById('clear-transactions'),
+      clearCompleted: document.getElementById('clear-completed'),
+      confirmClear: document.getElementById('confirm-clear'),
+      cancelClear: document.getElementById('cancel-clear'),
+      
+      // Tabs
       tabButtons: document.querySelectorAll('.tab-button'),
       tabContents: document.querySelectorAll('.tab-content'),
+      
+      // Gráficos
       balanceChart: document.getElementById('balance-chart'),
-      categoriesChart: document.getElementById('categories-chart')
+      categoriesChart: document.getElementById('categories-chart'),
+      
+      // Modais
+      confirmClearModal: document.getElementById('confirm-clear-modal'),
+      categoryModal: document.getElementById('category-modal'),
+      closeModal: document.querySelector('.close-modal')
     };
 
     // Configura data padrão para hoje
@@ -60,6 +100,7 @@ class FinanceApp {
       { name: 'Lazer', color: '#f59e0b' },
       { name: 'Salário', color: '#8b5cf6' }
     ];
+    this.reminders = JSON.parse(localStorage.getItem('reminders')) || [];
 
     // Verifica contas fixas do mês atual
     this.checkFixedTransactions();
@@ -69,6 +110,7 @@ class FinanceApp {
     localStorage.setItem('transactions', JSON.stringify(this.transactions));
     localStorage.setItem('fixedTransactions', JSON.stringify(this.fixedTransactions));
     localStorage.setItem('categories', JSON.stringify(this.categories));
+    localStorage.setItem('reminders', JSON.stringify(this.reminders));
   }
 
   initEventListeners() {
@@ -83,6 +125,18 @@ class FinanceApp {
       this.addTransaction();
     });
 
+    // Formulário de lembrete
+    this.elements.reminderForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.addReminder();
+    });
+
+    // Formulário de categoria
+    this.elements.categoryForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.addCategory();
+    });
+
     // Parcelamento
     this.elements.transactionParceled.addEventListener('change', (e) => {
       this.elements.transactionInstallments.disabled = !e.target.checked;
@@ -95,6 +149,7 @@ class FinanceApp {
     this.elements.filterMonth.addEventListener('change', () => this.filterTransactions());
     this.elements.clearFilters.addEventListener('click', () => this.clearFilters());
     
+    this.elements.filterFixedType.addEventListener('change', () => this.filterFixedTransactions());
     this.elements.filterFixedStatus.addEventListener('change', () => this.filterFixedTransactions());
     this.elements.filterFixedCategory.addEventListener('change', () => this.filterFixedTransactions());
 
@@ -105,6 +160,46 @@ class FinanceApp {
     this.elements.themeToggle.addEventListener('click', () => {
       document.documentElement.classList.toggle('light-mode');
       localStorage.setItem('theme', document.documentElement.classList.contains('light-mode') ? 'light' : 'dark');
+    });
+
+    // Botão para adicionar categoria
+    this.elements.addCategoryBtn.addEventListener('click', () => {
+      this.elements.categoryModal.classList.add('active');
+    });
+
+    // Botão para limpar transações
+    this.elements.clearTransactions.addEventListener('click', () => {
+      this.elements.confirmClearModal.classList.add('active');
+    });
+
+    // Confirmação para limpar transações
+    this.elements.confirmClear.addEventListener('click', () => {
+      this.clearAllTransactions();
+      this.elements.confirmClearModal.classList.remove('active');
+    });
+
+    // Cancelar limpeza
+    this.elements.cancelClear.addEventListener('click', () => {
+      this.elements.confirmClearModal.classList.remove('active');
+    });
+
+    // Botão para limpar lembretes concluídos
+    this.elements.clearCompleted.addEventListener('click', () => {
+      this.clearCompletedReminders();
+    });
+
+    // Fechar modais
+    this.elements.closeModal.addEventListener('click', () => {
+      this.elements.categoryModal.classList.remove('active');
+    });
+
+    // Fecha modal ao clicar fora
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+        }
+      });
     });
 
     // Verifica tema salvo
@@ -126,6 +221,8 @@ class FinanceApp {
     // Atualiza os dados da tab
     if (tabId === 'fixed') {
       this.filterFixedTransactions();
+    } else if (tabId === 'reminders') {
+      this.renderReminders();
     } else if (tabId === 'reports') {
       this.updateReports();
     }
@@ -201,399 +298,22 @@ class FinanceApp {
     this.elements.transactionDate.value = new Date().toISOString().split('T')[0];
   }
 
-  checkFixedTransactions() {
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth();
-    const currentYear = currentDate.getFullYear();
-    
-    // Verifica se já foi executado este mês
-    const lastCheck = localStorage.getItem('lastFixedCheck');
-    if (lastCheck && parseInt(lastCheck.split('-')[0]) === currentYear && parseInt(lastCheck.split('-')[1]) === currentMonth) {
-      return;
-    }
-    
-    // Adiciona contas fixas para o mês atual
-    const addedTransactions = [];
-    
-    this.fixedTransactions.forEach(transaction => {
-      const transactionDate = new Date(transaction.date);
-      if (transactionDate.getMonth() !== currentMonth || transactionDate.getFullYear() !== currentYear) {
-        const newDate = new Date(currentYear, currentMonth, transactionDate.getDate());
-        
-        const newTransaction = {
-          ...transaction,
-          id: Date.now() + Math.floor(Math.random() * 1000),
-          date: newDate.toISOString().split('T')[0],
-          paid: false
-        };
-        
-        this.transactions.push(newTransaction);
-        addedTransactions.push(newTransaction);
-      }
-    });
-    
-    // Marca como verificado este mês
-    localStorage.setItem('lastFixedCheck', `${currentYear}-${currentMonth}`);
-    this.saveData();
-    
-    if (addedTransactions.length > 0) {
+  deleteTransaction(id) {
+    if (confirm('Deseja realmente excluir este lançamento?')) {
+      this.transactions = this.transactions.filter(t => t.id !== id);
+      this.fixedTransactions = this.fixedTransactions.filter(t => t.id !== id);
+      this.saveData();
       this.renderAll();
     }
   }
 
-  renderAll() {
-    this.updateCategoriesDropdowns();
-    this.filterTransactions();
-    this.filterFixedTransactions();
-    this.updateBalance();
-    this.updateCashFlow();
-    this.updateReports();
+  clearAllTransactions() {
+    this.transactions = [];
+    this.fixedTransactions = [];
+    this.saveData();
+    this.renderAll();
   }
 
-  updateCategoriesDropdowns() {
-    // Atualiza dropdown de categorias
-    this.elements.transactionCategory.innerHTML = '<option value="">Sem categoria</option>';
-    this.elements.filterCategory.innerHTML = '<option value="all">Todas Categorias</option>';
-    this.elements.filterFixedCategory.innerHTML = '<option value="all">Todas Categorias</option>';
-    
-    this.categories.forEach(category => {
-      const option1 = document.createElement('option');
-      option1.value = category.name;
-      option1.textContent = category.name;
-      this.elements.transactionCategory.appendChild(option1);
-      
-      const option2 = document.createElement('option');
-      option2.value = category.name;
-      option2.textContent = category.name;
-      this.elements.filterCategory.appendChild(option2);
-      
-      const option3 = document.createElement('option');
-      option3.value = category.name;
-      option3.textContent = category.name;
-      this.elements.filterFixedCategory.appendChild(option3);
-    });
-  }
-
-  filterTransactions() {
-    const type = this.elements.filterType.value;
-    const category = this.elements.filterCategory.value;
-    const status = this.elements.filterStatus.value;
-    const month = this.elements.filterMonth.value;
-    
-    let filtered = [...this.transactions];
-    
-    // Filtra por tipo
-    if (type !== 'all') {
-      filtered = filtered.filter(t => t.type === type);
-    }
-    
-    // Filtra por categoria
-    if (category !== 'all') {
-      filtered = filtered.filter(t => t.category === category);
-    }
-    
-    // Filtra por status
-    if (status === 'fixed') {
-      filtered = filtered.filter(t => t.fixed);
-    } else if (status === 'parceled') {
-      filtered = filtered.filter(t => t.installments > 1);
-    }
-    
-    // Filtra por mês/ano
-    if (month) {
-      const [year, monthNum] = month.split('-');
-      filtered = filtered.filter(t => {
-        const date = new Date(t.date);
-        return date.getFullYear() === parseInt(year) && 
-               date.getMonth() + 1 === parseInt(monthNum);
-      });
-    }
-    
-    // Ordena por data (mais recente primeiro)
-    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    // Renderiza as transações filtradas
-    this.renderTransactions(filtered);
-    
-    return filtered;
-  }
-
-  renderTransactions(transactions) {
-    this.elements.transactionsContainer.innerHTML = '';
-    
-    transactions.forEach(transaction => {
-      const li = document.createElement('li');
-      li.className = `transaction-item ${transaction.type} ${transaction.fixed ? 'fixed' : ''} ${transaction.installments > 1 ? 'parceled' : ''} ${transaction.paid ? 'paid' : ''}`;
-      
-      li.innerHTML = `
-        <div class="transaction-info">
-          <div class="transaction-description">${transaction.description}</div>
-          <div class="transaction-meta">
-            <span>${new Date(transaction.date).toLocaleDateString()}</span>
-            ${transaction.category ? `<span>${transaction.category}</span>` : ''}
-            ${transaction.installments > 1 ? `<span>Parcela ${transaction.installmentNumber}/${transaction.installments}</span>` : ''}
-          </div>
-        </div>
-        <div class="transaction-amount ${transaction.type}">
-          ${transaction.type === 'expense' ? '-' : ''}R$ ${Math.abs(transaction.amount).toFixed(2)}
-        </div>
-      `;
-      
-      this.elements.transactionsContainer.appendChild(li);
-    });
-  }
-
-  filterFixedTransactions() {
-    const status = this.elements.filterFixedStatus.value;
-    const category = this.elements.filterFixedCategory.value;
-    
-    let filtered = [...this.fixedTransactions];
-    
-    // Filtra por status
-    if (status === 'paid') {
-      filtered = filtered.filter(t => t.paid);
-    } else if (status === 'unpaid') {
-      filtered = filtered.filter(t => !t.paid);
-    }
-    
-    // Filtra por categoria
-    if (category !== 'all') {
-      filtered = filtered.filter(t => t.category === category);
-    }
-    
-    // Renderiza as contas fixas filtradas
-    this.renderFixedTransactions(filtered);
-  }
-
-  renderFixedTransactions(transactions) {
-    this.elements.fixedContainer.innerHTML = '';
-    
-    transactions.forEach(transaction => {
-      const li = document.createElement('li');
-      li.className = `transaction-item fixed ${transaction.paid ? 'paid' : ''}`;
-      
-      li.innerHTML = `
-        <div class="transaction-info">
-          <div class="transaction-description">${transaction.description}</div>
-          <div class="transaction-meta">
-            <span>Todo dia ${new Date(transaction.date).getDate()}</span>
-            ${transaction.category ? `<span>${transaction.category}</span>` : ''}
-          </div>
-        </div>
-        <div class="transaction-amount ${transaction.type}">
-          ${transaction.type === 'expense' ? '-' : ''}R$ ${Math.abs(transaction.amount).toFixed(2)}
-        </div>
-      `;
-      
-      this.elements.fixedContainer.appendChild(li);
-    });
-  }
-
-  updateBalance() {
-    const income = this.transactions
-      .filter(t => t.type === 'income')
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-    
-    const expenses = this.transactions
-      .filter(t => t.type === 'expense')
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-    
-    this.currentBalance = income - expenses;
-    
-    this.elements.totalIncome.textContent = `R$ ${income.toFixed(2)}`;
-    this.elements.totalExpenses.textContent = `R$ ${expenses.toFixed(2)}`;
-    this.elements.currentBalance.textContent = `R$ ${this.currentBalance.toFixed(2)}`;
-    
-    // Cor do saldo
-    this.elements.currentBalance.style.color = this.currentBalance >= 0 ? 'var(--success)' : 'var(--danger)';
-  }
-
-  updateCashFlow() {
-    // Ordena transações por data
-    const sortedTransactions = [...this.transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
-    
-    let runningBalance = 0;
-    this.elements.cashFlowBody.innerHTML = '';
-    
-    sortedTransactions.forEach(transaction => {
-      runningBalance += transaction.amount;
-      
-      const row = document.createElement('tr');
-      row.className = `${transaction.type}-row ${transaction.fixed ? 'fixed-row' : ''} ${transaction.installments > 1 ? 'parceled-row' : ''}`;
-      
-      row.innerHTML = `
-        <td>${new Date(transaction.date).toLocaleDateString()}</td>
-        <td>
-          ${transaction.description}
-          ${transaction.installments > 1 ? ` (${transaction.installmentNumber}/${transaction.installments})` : ''}
-        </td>
-        <td>${transaction.category || '-'}</td>
-        <td>${transaction.type === 'expense' ? '-' : ''}R$ ${Math.abs(transaction.amount).toFixed(2)}</td>
-        <td>R$ ${runningBalance.toFixed(2)}</td>
-      `;
-      
-      this.elements.cashFlowBody.appendChild(row);
-    });
-  }
-
-  updateReports() {
-    const period = this.elements.reportPeriodSelect.value;
-    let transactions = [];
-    
-    // Filtra por período
-    switch (period) {
-      case 'current-month':
-        transactions = this.getCurrentMonthTransactions();
-        break;
-      case 'last-month':
-        transactions = this.getLastMonthTransactions();
-        break;
-      case 'last-3-months':
-        transactions = this.getLastThreeMonthsTransactions();
-        break;
-      default:
-        transactions = this.transactions;
-    }
-    
-    // Atualiza gráficos
-    this.updateBalanceChart(transactions);
-    this.updateCategoriesChart(transactions);
-  }
-
-  getCurrentMonthTransactions() {
+  checkFixedTransactions() {
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth();
-    const currentYear = currentDate.getFullYear();
-    
-    return this.transactions.filter(t => {
-      const date = new Date(t.date);
-      return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
-    });
-  }
-
-  getLastMonthTransactions() {
-    const currentDate = new Date();
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    const lastMonth = currentDate.getMonth();
-    const year = currentDate.getFullYear();
-    
-    return this.transactions.filter(t => {
-      const date = new Date(t.date);
-      return date.getMonth() === lastMonth && date.getFullYear() === year;
-    });
-  }
-
-  getLastThreeMonthsTransactions() {
-    const currentDate = new Date();
-    const threeMonthsAgo = new Date(currentDate);
-    threeMonthsAgo.setMonth(currentDate.getMonth() - 3);
-    
-    return this.transactions.filter(t => {
-      const date = new Date(t.date);
-      return date >= threeMonthsAgo && date <= currentDate;
-    });
-  }
-
-  updateBalanceChart(transactions) {
-    const income = transactions
-      .filter(t => t.type === 'income')
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-    
-    const expenses = transactions
-      .filter(t => t.type === 'expense')
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-    
-    // Se já existir um gráfico, destrua antes de criar um novo
-    if (this.balanceChartInstance) {
-      this.balanceChartInstance.destroy();
-    }
-    
-    this.balanceChartInstance = new Chart(this.elements.balanceChart, {
-      type: 'doughnut',
-      data: {
-        labels: ['Receitas', 'Despesas'],
-        datasets: [{
-          data: [income, expenses],
-          backgroundColor: [
-            'rgba(16, 185, 129, 0.7)',
-            'rgba(239, 68, 68, 0.7)'
-          ],
-          borderColor: [
-            'rgba(16, 185, 129, 1)',
-            'rgba(239, 68, 68, 1)'
-          ],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'bottom'
-          }
-        }
-      }
-    });
-  }
-
-  updateCategoriesChart(transactions) {
-    const expenses = transactions.filter(t => t.type === 'expense');
-    
-    // Agrupa despesas por categoria
-    const categoriesMap = {};
-    
-    expenses.forEach(expense => {
-      const category = expense.category || 'Outros';
-      if (!categoriesMap[category]) {
-        categoriesMap[category] = 0;
-      }
-      categoriesMap[category] += Math.abs(expense.amount);
-    });
-    
-    const categories = Object.keys(categoriesMap);
-    const amounts = Object.values(categoriesMap);
-    
-    // Se já existir um gráfico, destrua antes de criar um novo
-    if (this.categoriesChartInstance) {
-      this.categoriesChartInstance.destroy();
-    }
-    
-    this.categoriesChartInstance = new Chart(this.elements.categoriesChart, {
-      type: 'bar',
-      data: {
-        labels: categories,
-        datasets: [{
-          label: 'Despesas por Categoria',
-          data: amounts,
-          backgroundColor: 'rgba(239, 68, 68, 0.7)',
-          borderColor: 'rgba(239, 68, 68, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
-    });
-  }
-
-  clearFilters() {
-    this.elements.filterType.value = 'all';
-    this.elements.filterCategory.value = 'all';
-    this.elements.filterStatus.value = 'all';
-    this.elements.filterMonth.value = '';
-    this.filterTransactions();
-  }
-}
-
-// Inicializa a aplicação quando o DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-  const app = new FinanceApp();
-  
-  // Verifica contas fixas diariamente
-  setInterval(() => app.checkFixedTransactions(), 24 * 60 * 60 * 1000);
-});
