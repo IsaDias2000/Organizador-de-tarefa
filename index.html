@@ -356,3 +356,185 @@
   <script src="script.js"></script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão Financeira</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-wallet"></i> Gestão Financeira</h1>
+    </header>
+
+    <div class="balance-container">
+      <div class="balance-card">
+        <h3>Saldo Atual</h3>
+        <p id="current-balance">R$ 0,00</p>
+      </div>
+      <div class="balance-card">
+        <h3>Receitas</h3>
+        <p id="total-income">R$ 0,00</p>
+      </div>
+      <div class="balance-card">
+        <h3>Despesas</h3>
+        <p id="total-expenses">R$ 0,00</p>
+      </div>
+    </div>
+
+    <nav>
+      <button class="tab-button active" data-tab="transactions"><i class="fas fa-exchange-alt"></i> Lançamentos</button>
+      <button class="tab-button" data-tab="fixed"><i class="fas fa-calendar-alt"></i> Fixas</button>
+      <button class="tab-button" data-tab="reminders"><i class="fas fa-bell"></i> Lembretes</button>
+      <button class="tab-button" data-tab="reports"><i class="fas fa-chart-pie"></i> Relatórios</button>
+    </nav>
+
+    <main>
+      <!-- Aba de Lançamentos -->
+      <section id="transactions" class="tab-content active">
+        <form id="transaction-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="transaction-type">Tipo</label>
+              <select id="transaction-type" required>
+                <option value="income">Receita</option>
+                <option value="expense">Despesa</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="transaction-date">Data</label>
+              <input type="date" id="transaction-date" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="transaction-description">Descrição</label>
+            <input type="text" id="transaction-description" placeholder="Salário, Aluguel, etc..." required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="transaction-amount">Valor (R$)</label>
+              <input type="number" id="transaction-amount" step="0.01" min="0.01" required>
+            </div>
+            <div class="form-group">
+              <label for="transaction-category">Categoria</label>
+              <div class="category-select">
+                <select id="transaction-category">
+                  <option value="">Sem categoria</option>
+                </select>
+                <button type="button" id="add-category-btn" class="btn-icon">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="transaction-installments">
+                <input type="checkbox" id="transaction-parceled"> Parcelar
+              </label>
+              <input type="number" id="transaction-installments" min="2" max="36" value="2" disabled>
+            </div>
+            <div class="form-group">
+              <label for="transaction-fixed">
+                <input type="checkbox" id="transaction-fixed"> Fixa
+              </label>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="transaction-due-date">Vencimento</label>
+              <input type="date" id="transaction-due-date">
+            </div>
+            <div class="form-group">
+              <label for="transaction-payday">Próximo pagamento</label>
+              <input type="date" id="transaction-payday">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">
+              <i class="fas fa-plus"></i> Adicionar
+            </button>
+          </div>
+        </form>
+
+        <div class="spending-calculator">
+          <h3><i class="fas fa-calculator"></i> Controle Diário</h3>
+          <div class="calculator-results">
+            <div class="result-card">
+              <span>Dias até o pagamento:</span>
+              <strong id="days-until-payday">0</strong>
+            </div>
+            <div class="result-card">
+              <span>Disponível por dia:</span>
+              <strong id="daily-budget">R$ 0,00</strong>
+            </div>
+          </div>
+          <button id="update-calculation" class="btn-secondary">
+            <i class="fas fa-sync-alt"></i> Atualizar Cálculo
+          </button>
+        </div>
+
+        <div class="transactions-list">
+          <h3>Histórico de Lançamentos</h3>
+          <ul id="transactions-container"></ul>
+        </div>
+      </section>
+
+      <!-- Aba de Contas Fixas -->
+      <section id="fixed" class="tab-content">
+        <div class="transactions-list">
+          <h3>Contas Fixas</h3>
+          <ul id="fixed-container"></ul>
+        </div>
+      </section>
+
+      <!-- Aba de Lembretes -->
+      <section id="reminders" class="tab-content">
+        <form id="reminder-form">
+          <div class="form-group">
+            <label for="reminder-description">Novo Lembrete</label>
+            <div class="reminder-input">
+              <input type="text" id="reminder-description" placeholder="Ex: Pagar conta de luz" required>
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-plus"></i> Adicionar
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <div class="reminders-lists">
+          <div class="reminders-section">
+            <h3><i class="fas fa-bell"></i> Lembretes Ativos</h3>
+            <ul id="active-reminders"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Aba de Relatórios -->
+      <section id="reports" class="tab-content">
+        <div class="charts-container">
+          <div class="chart-card">
+            <h4>Receitas vs Despesas</h4>
+            <canvas id="balance-chart"></canvas>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
