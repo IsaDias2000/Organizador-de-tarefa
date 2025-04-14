@@ -1,21 +1,20 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestão Financeira</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon-192.png">
-  <meta name="theme-color" content="#2563eb">
+  <meta name="theme-color" content="#0f172a">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js" async></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="container">
     <header>
       <h1><i class="fas fa-wallet"></i> Gestão Financeira</h1>
-      <button id="theme-toggle" aria-label="Alternar tema"><i class="fas fa-moon"></i></button>
     </header>
 
     <div class="balance-container">
@@ -98,7 +97,7 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label for="transaction-due-date">Vencimento (para parcelas)</label>
+              <label for="transaction-due-date">Vencimento</label>
               <input type="date" id="transaction-due-date">
             </div>
             <div class="form-group">
@@ -117,7 +116,6 @@
           </div>
         </form>
 
-        <!-- Calculadora de Gastos Diários -->
         <div class="spending-calculator">
           <h3><i class="fas fa-calculator"></i> Controle Diário</h3>
           <div class="calculator-results">
@@ -137,31 +135,6 @@
           <button id="update-calculation" class="btn-secondary">
             <i class="fas fa-sync-alt"></i> Atualizar Cálculo
           </button>
-        </div>
-
-        <!-- Filtros -->
-        <div class="filters-container">
-          <h3>Filtrar Lançamentos</h3>
-          <div class="filters">
-            <select id="filter-type">
-              <option value="all">Todos</option>
-              <option value="income">Receitas</option>
-              <option value="expense">Despesas</option>
-            </select>
-            <select id="filter-category">
-              <option value="all">Todas Categorias</option>
-            </select>
-            <select id="filter-status">
-              <option value="all">Todos</option>
-              <option value="fixed">Apenas Fixas</option>
-              <option value="parceled">Apenas Parceladas</option>
-              <option value="pending">Apenas Pendentes</option>
-            </select>
-            <input type="month" id="filter-month">
-            <button id="clear-filters" class="btn-secondary">
-              <i class="fas fa-times"></i> Limpar
-            </button>
-          </div>
         </div>
 
         <div class="transactions-list">
@@ -378,35 +351,8 @@
         </form>
       </div>
     </div>
-
-    <div id="account-modal" class="modal">
-      <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <h3>Adicionar Nova Conta</h3>
-        <form id="account-form">
-          <div class="form-group">
-            <label for="new-account-name">Nome da Conta</label>
-            <input type="text" id="new-account-name" required>
-          </div>
-          <div class="form-group">
-            <label for="new-account-type">Tipo</label>
-            <select id="new-account-type" required>
-              <option value="checking">Conta Corrente</option>
-              <option value="savings">Conta Poupança</option>
-              <option value="credit">Cartão de Crédito</option>
-              <option value="investment">Investimento</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="new-account-initial-balance">Saldo Inicial (R$)</label>
-            <input type="number" id="new-account-initial-balance" step="0.01" value="0">
-          </div>
-          <button type="submit" class="btn-primary">Salvar Conta</button>
-        </form>
-      </div>
-    </div>
   </div>
 
-  <script src="script.js" type="module"></script>
+  <script src="script.js"></script>
 </body>
 </html>
