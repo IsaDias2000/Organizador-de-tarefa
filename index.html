@@ -36,6 +36,7 @@
     <nav>
       <button class="tab-button active" data-tab="transactions"><i class="fas fa-exchange-alt"></i> Lançamentos</button>
       <button class="tab-button" data-tab="fixed"><i class="fas fa-calendar-alt"></i> Fixas</button>
+      <button class="tab-button" data-tab="reminders"><i class="fas fa-bell"></i> Lembretes</button>
       <button class="tab-button" data-tab="reports"><i class="fas fa-chart-pie"></i> Relatórios</button>
     </nav>
 
@@ -69,9 +70,14 @@
             </div>
             <div class="form-group">
               <label for="transaction-category">Categoria</label>
-              <select id="transaction-category">
-                <option value="">Sem categoria</option>
-              </select>
+              <div class="category-select">
+                <select id="transaction-category">
+                  <option value="">Sem categoria</option>
+                </select>
+                <button type="button" id="add-category-btn" class="btn-icon">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -89,9 +95,14 @@
             </div>
           </div>
 
-          <button type="submit" class="btn-primary">
-            <i class="fas fa-plus"></i> Adicionar
-          </button>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">
+              <i class="fas fa-plus"></i> Adicionar
+            </button>
+            <button type="button" id="clear-transactions" class="btn-danger">
+              <i class="fas fa-trash"></i> Limpar Tudo
+            </button>
+          </div>
         </form>
 
         <!-- Filtros -->
@@ -120,6 +131,16 @@
 
         <div class="transactions-list">
           <h3>Histórico de Lançamentos</h3>
+          <div class="summary-cards">
+            <div class="summary-card" id="fixed-expenses-summary">
+              <span>Despesas Fixas:</span>
+              <strong>R$ 0,00</strong>
+            </div>
+            <div class="summary-card" id="parceled-expenses-summary">
+              <span>Parceladas:</span>
+              <strong>R$ 0,00</strong>
+            </div>
+          </div>
           <ul id="transactions-container"></ul>
         </div>
       </section>
@@ -129,6 +150,11 @@
         <div class="filters-container">
           <h3>Filtrar Contas Fixas</h3>
           <div class="filters">
+            <select id="filter-fixed-type">
+              <option value="all">Todas</option>
+              <option value="income">Receitas</option>
+              <option value="expense">Despesas</option>
+            </select>
             <select id="filter-fixed-status">
               <option value="all">Todas</option>
               <option value="paid">Pagas</option>
@@ -142,7 +168,47 @@
 
         <div class="transactions-list">
           <h3>Contas Fixas</h3>
+          <div class="summary-cards">
+            <div class="summary-card" id="fixed-income-summary">
+              <span>Receitas Fixas:</span>
+              <strong>R$ 0,00</strong>
+              <small>0% da receita total</small>
+            </div>
+            <div class="summary-card" id="fixed-expense-summary">
+              <span>Despesas Fixas:</span>
+              <strong>R$ 0,00</strong>
+            </div>
+          </div>
           <ul id="fixed-container"></ul>
+        </div>
+      </section>
+
+      <!-- Nova Aba de Lembretes -->
+      <section id="reminders" class="tab-content">
+        <form id="reminder-form">
+          <div class="form-group">
+            <label for="reminder-description">Novo Lembrete</label>
+            <div class="reminder-input">
+              <input type="text" id="reminder-description" placeholder="Ex: Pagar conta de luz" required>
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-plus"></i> Adicionar
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <div class="reminders-lists">
+          <div class="reminders-section">
+            <h3><i class="fas fa-bell"></i> Lembretes Ativos</h3>
+            <ul id="active-reminders"></ul>
+          </div>
+          <div class="reminders-section">
+            <h3><i class="fas fa-check-circle"></i> Concluídos</h3>
+            <ul id="completed-reminders"></ul>
+            <button id="clear-completed" class="btn-danger">
+              <i class="fas fa-trash"></i> Limpar Concluídos
+            </button>
+          </div>
         </div>
       </section>
 
@@ -184,6 +250,37 @@
         </div>
       </section>
     </main>
+
+    <!-- Modal para Confirmar Limpeza -->
+    <div id="confirm-clear-modal" class="modal">
+      <div class="modal-content">
+        <h3>Confirmar Limpeza</h3>
+        <p>Todos os lançamentos serão permanentemente removidos. Deseja continuar?</p>
+        <div class="modal-actions">
+          <button id="confirm-clear" class="btn-danger">Sim, Limpar Tudo</button>
+          <button id="cancel-clear" class="btn-secondary">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Adicionar Categoria -->
+    <div id="category-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h3>Adicionar Nova Categoria</h3>
+        <form id="category-form">
+          <div class="form-group">
+            <label for="new-category-name">Nome da Categoria</label>
+            <input type="text" id="new-category-name" required>
+          </div>
+          <div class="form-group">
+            <label for="new-category-color">Cor</label>
+            <input type="color" id="new-category-color" value="#3b82f6">
+          </div>
+          <button type="submit" class="btn-primary">Salvar Categoria</button>
+        </form>
+      </div>
+    </div>
   </div>
 
   <script src="script.js" type="module"></script>
