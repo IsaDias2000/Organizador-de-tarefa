@@ -3,8 +3,7 @@ class FinanceApp {
     this.transactions = [];
     this.fixedTransactions = [];
     this.categories = [];
-    this.currentMonth = new Date().getMonth();
-    this.currentYear = new Date().getFullYear();
+    this.currentBalance = 0;
     
     this.initElements();
     this.loadData();
@@ -40,7 +39,9 @@ class FinanceApp {
       totalExpenses: document.getElementById('total-expenses'),
       themeToggle: document.getElementById('theme-toggle'),
       tabButtons: document.querySelectorAll('.tab-button'),
-      tabContents: document.querySelectorAll('.tab-content')
+      tabContents: document.querySelectorAll('.tab-content'),
+      balanceChart: document.getElementById('balance-chart'),
+      categoriesChart: document.getElementById('categories-chart')
     };
 
     // Configura data padrão para hoje
@@ -141,19 +142,23 @@ class FinanceApp {
     const isFixed = this.elements.transactionFixed.checked;
 
     // Validação básica
-    if (!description || isNaN(amount) return;
+    if (!description || isNaN(amount)) {
+      alert('Preencha todos os campos corretamente!');
+      return;
+    }
 
     const newTransaction = {
       id: Date.now(),
       type,
       date,
       description,
-      amount,
+      amount: type === 'expense' ? -Math.abs(amount) : Math.abs(amount),
       category,
       installments,
       installmentNumber: 1,
       fixed: isFixed,
-      paid: false
+      paid: false,
+      createdAt: new Date().toISOString()
     };
 
     // Adiciona transação principal
@@ -171,7 +176,8 @@ class FinanceApp {
           ...newTransaction,
           id: Date.now() + i,
           date: nextMonth.toISOString().split('T')[0],
-          installmentNumber: i
+          installmentNumber: i,
+          paid: false
         };
         
         this.transactions.push(installment);
@@ -190,12 +196,15 @@ class FinanceApp {
     this.saveData();
     this.renderAll();
     this.elements.transactionForm.reset();
+    
+    // Reseta para data atual
     this.elements.transactionDate.value = new Date().toISOString().split('T')[0];
   }
 
   checkFixedTransactions() {
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
     
     // Verifica se já foi executado este mês
     const lastCheck = localStorage.getItem('lastFixedCheck');
@@ -204,6 +213,8 @@ class FinanceApp {
     }
     
     // Adiciona contas fixas para o mês atual
+    const addedTransactions = [];
+    
     this.fixedTransactions.forEach(transaction => {
       const transactionDate = new Date(transaction.date);
       if (transactionDate.getMonth() !== currentMonth || transactionDate.getFullYear() !== currentYear) {
@@ -211,19 +222,23 @@ class FinanceApp {
         
         const newTransaction = {
           ...transaction,
-          id: Date.now(),
+          id: Date.now() + Math.floor(Math.random() * 1000),
           date: newDate.toISOString().split('T')[0],
           paid: false
         };
         
         this.transactions.push(newTransaction);
+        addedTransactions.push(newTransaction);
       }
     });
     
     // Marca como verificado este mês
     localStorage.setItem('lastFixedCheck', `${currentYear}-${currentMonth}`);
     this.saveData();
-    this.renderAll();
+    
+    if (addedTransactions.length > 0) {
+      this.renderAll();
+    }
   }
 
   renderAll() {
@@ -231,6 +246,7 @@ class FinanceApp {
     this.filterTransactions();
     this.filterFixedTransactions();
     this.updateBalance();
+    this.updateCashFlow();
     this.updateReports();
   }
 
@@ -264,7 +280,7 @@ class FinanceApp {
     const status = this.elements.filterStatus.value;
     const month = this.elements.filterMonth.value;
     
-    let filtered = this.transactions;
+    let filtered = [...this.transactions];
     
     // Filtra por tipo
     if (type !== 'all') {
@@ -315,11 +331,11 @@ class FinanceApp {
           <div class="transaction-meta">
             <span>${new Date(transaction.date).toLocaleDateString()}</span>
             ${transaction.category ? `<span>${transaction.category}</span>` : ''}
-            ${transaction.installments > 1 ? `<span>${transaction.installmentNumber}/${transaction.installments}</span>` : ''}
+            ${transaction.installments > 1 ? `<span>Parcela ${transaction.installmentNumber}/${transaction.installments}</span>` : ''}
           </div>
         </div>
         <div class="transaction-amount ${transaction.type}">
-          ${transaction.type === 'expense' ? '-' : ''}R$ ${transaction.amount.toFixed(2)}
+          ${transaction.type === 'expense' ? '-' : ''}R$ ${Math.abs(transaction.amount).toFixed(2)}
         </div>
       `;
       
@@ -327,25 +343,242 @@ class FinanceApp {
     });
   }
 
-  // ... (continua com os outros métodos para contas fixas, relatórios, etc.)
+  filterFixedTransactions() {
+    const status = this.elements.filterFixedStatus.value;
+    const category = this.elements.filterFixedCategory.value;
+    
+    let filtered = [...this.fixedTransactions];
+    
+    // Filtra por status
+    if (status === 'paid') {
+      filtered = filtered.filter(t => t.paid);
+    } else if (status === 'unpaid') {
+      filtered = filtered.filter(t => !t.paid);
+    }
+    
+    // Filtra por categoria
+    if (category !== 'all') {
+      filtered = filtered.filter(t => t.category === category);
+    }
+    
+    // Renderiza as contas fixas filtradas
+    this.renderFixedTransactions(filtered);
+  }
+
+  renderFixedTransactions(transactions) {
+    this.elements.fixedContainer.innerHTML = '';
+    
+    transactions.forEach(transaction => {
+      const li = document.createElement('li');
+      li.className = `transaction-item fixed ${transaction.paid ? 'paid' : ''}`;
+      
+      li.innerHTML = `
+        <div class="transaction-info">
+          <div class="transaction-description">${transaction.description}</div>
+          <div class="transaction-meta">
+            <span>Todo dia ${new Date(transaction.date).getDate()}</span>
+            ${transaction.category ? `<span>${transaction.category}</span>` : ''}
+          </div>
+        </div>
+        <div class="transaction-amount ${transaction.type}">
+          ${transaction.type === 'expense' ? '-' : ''}R$ ${Math.abs(transaction.amount).toFixed(2)}
+        </div>
+      `;
+      
+      this.elements.fixedContainer.appendChild(li);
+    });
+  }
 
   updateBalance() {
     const income = this.transactions
       .filter(t => t.type === 'income')
-      .reduce((sum, t) => sum + t.amount, 0);
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
     
     const expenses = this.transactions
       .filter(t => t.type === 'expense')
-      .reduce((sum, t) => sum + t.amount, 0);
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
     
-    const balance = income - expenses;
+    this.currentBalance = income - expenses;
     
     this.elements.totalIncome.textContent = `R$ ${income.toFixed(2)}`;
     this.elements.totalExpenses.textContent = `R$ ${expenses.toFixed(2)}`;
-    this.elements.currentBalance.textContent = `R$ ${balance.toFixed(2)}`;
+    this.elements.currentBalance.textContent = `R$ ${this.currentBalance.toFixed(2)}`;
     
     // Cor do saldo
-    this.elements.currentBalance.style.color = balance >= 0 ? 'var(--success)' : 'var(--danger)';
+    this.elements.currentBalance.style.color = this.currentBalance >= 0 ? 'var(--success)' : 'var(--danger)';
+  }
+
+  updateCashFlow() {
+    // Ordena transações por data
+    const sortedTransactions = [...this.transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    let runningBalance = 0;
+    this.elements.cashFlowBody.innerHTML = '';
+    
+    sortedTransactions.forEach(transaction => {
+      runningBalance += transaction.amount;
+      
+      const row = document.createElement('tr');
+      row.className = `${transaction.type}-row ${transaction.fixed ? 'fixed-row' : ''} ${transaction.installments > 1 ? 'parceled-row' : ''}`;
+      
+      row.innerHTML = `
+        <td>${new Date(transaction.date).toLocaleDateString()}</td>
+        <td>
+          ${transaction.description}
+          ${transaction.installments > 1 ? ` (${transaction.installmentNumber}/${transaction.installments})` : ''}
+        </td>
+        <td>${transaction.category || '-'}</td>
+        <td>${transaction.type === 'expense' ? '-' : ''}R$ ${Math.abs(transaction.amount).toFixed(2)}</td>
+        <td>R$ ${runningBalance.toFixed(2)}</td>
+      `;
+      
+      this.elements.cashFlowBody.appendChild(row);
+    });
+  }
+
+  updateReports() {
+    const period = this.elements.reportPeriodSelect.value;
+    let transactions = [];
+    
+    // Filtra por período
+    switch (period) {
+      case 'current-month':
+        transactions = this.getCurrentMonthTransactions();
+        break;
+      case 'last-month':
+        transactions = this.getLastMonthTransactions();
+        break;
+      case 'last-3-months':
+        transactions = this.getLastThreeMonthsTransactions();
+        break;
+      default:
+        transactions = this.transactions;
+    }
+    
+    // Atualiza gráficos
+    this.updateBalanceChart(transactions);
+    this.updateCategoriesChart(transactions);
+  }
+
+  getCurrentMonthTransactions() {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    
+    return this.transactions.filter(t => {
+      const date = new Date(t.date);
+      return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+    });
+  }
+
+  getLastMonthTransactions() {
+    const currentDate = new Date();
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    const lastMonth = currentDate.getMonth();
+    const year = currentDate.getFullYear();
+    
+    return this.transactions.filter(t => {
+      const date = new Date(t.date);
+      return date.getMonth() === lastMonth && date.getFullYear() === year;
+    });
+  }
+
+  getLastThreeMonthsTransactions() {
+    const currentDate = new Date();
+    const threeMonthsAgo = new Date(currentDate);
+    threeMonthsAgo.setMonth(currentDate.getMonth() - 3);
+    
+    return this.transactions.filter(t => {
+      const date = new Date(t.date);
+      return date >= threeMonthsAgo && date <= currentDate;
+    });
+  }
+
+  updateBalanceChart(transactions) {
+    const income = transactions
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    
+    const expenses = transactions
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    
+    // Se já existir um gráfico, destrua antes de criar um novo
+    if (this.balanceChartInstance) {
+      this.balanceChartInstance.destroy();
+    }
+    
+    this.balanceChartInstance = new Chart(this.elements.balanceChart, {
+      type: 'doughnut',
+      data: {
+        labels: ['Receitas', 'Despesas'],
+        datasets: [{
+          data: [income, expenses],
+          backgroundColor: [
+            'rgba(16, 185, 129, 0.7)',
+            'rgba(239, 68, 68, 0.7)'
+          ],
+          borderColor: [
+            'rgba(16, 185, 129, 1)',
+            'rgba(239, 68, 68, 1)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  }
+
+  updateCategoriesChart(transactions) {
+    const expenses = transactions.filter(t => t.type === 'expense');
+    
+    // Agrupa despesas por categoria
+    const categoriesMap = {};
+    
+    expenses.forEach(expense => {
+      const category = expense.category || 'Outros';
+      if (!categoriesMap[category]) {
+        categoriesMap[category] = 0;
+      }
+      categoriesMap[category] += Math.abs(expense.amount);
+    });
+    
+    const categories = Object.keys(categoriesMap);
+    const amounts = Object.values(categoriesMap);
+    
+    // Se já existir um gráfico, destrua antes de criar um novo
+    if (this.categoriesChartInstance) {
+      this.categoriesChartInstance.destroy();
+    }
+    
+    this.categoriesChartInstance = new Chart(this.elements.categoriesChart, {
+      type: 'bar',
+      data: {
+        labels: categories,
+        datasets: [{
+          label: 'Despesas por Categoria',
+          data: amounts,
+          backgroundColor: 'rgba(239, 68, 68, 0.7)',
+          borderColor: 'rgba(239, 68, 68, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
   }
 
   clearFilters() {
@@ -357,7 +590,10 @@ class FinanceApp {
   }
 }
 
-// Inicializa a aplicação
+// Inicializa a aplicação quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => {
   const app = new FinanceApp();
+  
+  // Verifica contas fixas diariamente
+  setInterval(() => app.checkFixedTransactions(), 24 * 60 * 60 * 1000);
 });
