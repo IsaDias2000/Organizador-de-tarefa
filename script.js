@@ -115,9 +115,15 @@ class FinanceApp {
 
     loadData() {
         const savedData = localStorage.getItem('financeAppData');
-        if (savedData) {
-            const data = JSON.parse(savedData);
-            this.transactions = data.transactions || [];
+    if (savedData) {
+        const data = JSON.parse(savedData);
+
+            this.transactions = data.transactions.map(t => ({
+            ...t,
+            date: new Date(t.date),
+            dueDate: t.dueDate ? new Date(t.dueDate) : null
+        }));
+
             this.goals = data.goals || [];
             this.reminders = data.reminders || [];
             this.categories = data.categories || this.categories;
@@ -409,7 +415,9 @@ class FinanceApp {
         
         this.currentBalance = this.totalIncome - this.totalExpenses;
         
-        const budget = this.calculateDailyBudget();
+            const budget = this.calculateDailyBudget();
+    this.dailyBudgetElement.textContent = this.formatCurrency(budget.daily);
+    this.monthlyBalanceElement.textContent = `Saldo mensal: ${this.formatCurrency(budget.monthly)}`;
         
         this.currentBalanceElement.textContent = this.formatCurrency(this.currentBalance);
         this.totalIncomeElement.textContent = this.formatCurrency(this.totalIncome);
@@ -418,7 +426,8 @@ class FinanceApp {
         this.dailyBudgetElement.textContent = this.formatCurrency(budget.daily);
         this.monthlyBalanceElement.textContent = `Saldo mensal: ${this.formatCurrency(budget.monthly)}`;
         
-        this.currentBalanceElement.style.color = this.currentBalance >= 0 ? 'var(--success)' : 'var(--danger)';
+this.currentBalanceElement.style.color = this.currentBalance >= 0 ? 'var(--success)' : 'var(--danger)';
+}
     }
 
     renderTransactions() {
@@ -438,13 +447,14 @@ class FinanceApp {
         }
         
         if (monthFilter) {
-            const [year, month] = monthFilter.split('-');
-            filteredTransactions = filteredTransactions.filter(t => {
-                const transactionDate = new Date(t.date);
-                return transactionDate.getFullYear() === parseInt(year) && 
-                       transactionDate.getMonth() + 1 === parseInt(month);
-            });
-        }
+    const [year, month] = monthFilter.split('-');
+    filteredTransactions = filteredTransactions.filter(t => {
+        const transactionDate = new Date(t.date);
+        return transactionDate.getFullYear() === parseInt(year) && 
+               transactionDate.getMonth() + 1 === parseInt(month);
+    });
+}
+
         
         if (searchTerm) {
             filteredTransactions = filteredTransactions.filter(t => 
@@ -594,7 +604,7 @@ class FinanceApp {
             goalElement.className = 'goal-card';
             
             const progress = (goal.currentAmount / goal.targetAmount) * 100;
-            const daysRemaining = Math.ceil((new Date(goal.targetDate) - new Date()) / (1000 * 60 * 60 * 24);
+const daysRemaining = Math.ceil((new Date(goal.targetDate) - new Date()) / (1000 * 60 * 60 * 24));
             
             goalElement.innerHTML = `
                 <h3>${goal.description}</h3>
@@ -805,7 +815,15 @@ class FinanceApp {
         this.categoryForm.reset();
     }
 
-    updateReports() {
+    updateReports()
+    {
+         if (this.balanceChart) {
+        this.balanceChart.destroy();
+    }
+    if (this.expenseChart) {
+        this.expenseChart.destroy();
+    }
+{
         const period = this.reportPeriod.value;
         let filteredTransactions = [];
         const today = new Date();
@@ -1147,3 +1165,15 @@ class FinanceApp {
 document.addEventListener('DOMContentLoaded', () => {
     const app = new FinanceApp();
 });
+// Registrar Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+                console.log('ServiceWorker registrado');
+            })
+            .catch(err => {
+                console.log('Falha ao registrar ServiceWorker', err);
+            });
+    });
+}
