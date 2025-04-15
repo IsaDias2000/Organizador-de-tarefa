@@ -1,48 +1,626 @@
-/* Estilos existentes... */
-
-/* Adicione esses novos estilos */
-.budget-card {
-  background: rgba(255, 255, 255, 0.15) !important;
-  backdrop-filter: blur(10px);
+:root {
+    --primary: #3b82f6;
+    --primary-dark: #2563eb;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --purple: #8b5cf6;
+    --dark: #1e293b;
+    --darker: #0f172a;
+    --darkest: #020617;
+    --light: #f8fafc;
+    --gray: #94a3b8;
+    --gray-dark: #64748b;
 }
 
-.budget-card h3 {
-  color: #f59e0b;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-#daily-budget {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #f59e0b;
+body {
+    background-color: var(--darker);
+    color: var(--light);
+    min-height: 100vh;
 }
 
-#days-remaining {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.8rem;
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
 }
 
-.transaction-item.overdue {
-  border-left: 4px solid #ef4444;
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--dark);
 }
 
-.paid-status {
-  display: inline-block;
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-  margin-right: 8px;
+header h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.8rem;
 }
 
-.paid-status.paid {
-  background-color: #10b981;
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
 }
 
-.paid-status.pending {
-  background-color: #f59e0b;
+.header-actions button {
+    background: var(--dark);
+    border: none;
+    color: var(--light);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
 }
 
-.paid-status.overdue {
-  background-color: #ef4444;
+.header-actions button:hover {
+    background: var(--primary);
 }
 
-/* Restante dos estilos existentes... */
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.balance-card {
+    background: var(--dark);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    text-align: center;
+}
+
+.balance-card h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--gray);
+}
+
+.balance-card p {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.balance-card.income {
+    border-top: 4px solid var(--success);
+}
+
+.balance-card.expense {
+    border-top: 4px solid var(--danger);
+}
+
+.balance-card.fixed {
+    border-top: 4px solid var(--purple);
+}
+
+.tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.tab-button {
+    background: var(--dark);
+    border: none;
+    color: var(--light);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.tab-button:hover {
+    background: var(--primary-dark);
+}
+
+.tab-button.active {
+    background: var(--primary);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+form {
+    background: var(--dark);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    flex: 1;
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--darker);
+    border: 1px solid var(--darkest);
+    border-radius: 0.5rem;
+    color: var(--light);
+    font-size: 1rem;
+}
+
+.category-select {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    background: var(--primary);
+    border: none;
+    color: var(--light);
+    width: 40px;
+    height: 40px;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: var(--primary-dark);
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.btn-primary {
+    background: var(--primary);
+    border: none;
+    color: var(--light);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+.btn-secondary {
+    background: var(--dark);
+    border: none;
+    color: var(--light);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-secondary:hover {
+    background: var(--gray-dark);
+}
+
+.btn-danger {
+    background: var(--danger);
+    border: none;
+    color: var(--light);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+.transaction-filters {
+    background: var(--dark);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.transaction-list {
+    background: var(--dark);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.list-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    padding: 1rem 1.5rem;
+    background: var(--darkest);
+    font-weight: 500;
+    color: var(--gray);
+}
+
+.transaction-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--darkest);
+    align-items: center;
+}
+
+.transaction-item.income {
+    border-left: 4px solid var(--success);
+}
+
+.transaction-item.expense {
+    border-left: 4px solid var(--danger);
+}
+
+.transaction-item.fixed {
+    border-left: 4px solid var(--purple);
+}
+
+.transaction-item .transaction-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.transaction-item button {
+    background: none;
+    border: none;
+    color: var(--gray);
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.transaction-item button:hover {
+    background: var(--darkest);
+    color: var(--light);
+}
+
+.goals-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.goal-card {
+    background: var(--dark);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+}
+
+.goal-card h3 {
+    margin-bottom: 0.5rem;
+}
+
+.goal-card .progress-bar {
+    height: 10px;
+    background: var(--darkest);
+    border-radius: 5px;
+    margin: 1rem 0;
+    overflow: hidden;
+}
+
+.goal-card .progress {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 5px;
+    transition: width 0.3s;
+}
+
+.goal-card .goal-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+.reminder-list {
+    margin-top: 1.5rem;
+}
+
+.reminder-group {
+    background: var(--dark);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.reminder-group h3 {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.reminder-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--darkest);
+}
+
+.reminder-item label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    flex: 1;
+}
+
+.reminder-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.reminder-item.completed {
+    opacity: 0.7;
+    text-decoration: line-through;
+}
+
+.reminder-item .reminder-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.reminder-item .reminder-actions button {
+    background: none;
+    border: none;
+    color: var(--gray);
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.reminder-item .reminder-actions button:hover {
+    background: var(--darkest);
+    color: var(--light);
+}
+
+.charts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.chart-card {
+    background: var(--dark);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+}
+
+.chart-card h4 {
+    margin-bottom: 1rem;
+}
+
+.tags-cloud {
+    background: var(--dark);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.tags-cloud h4 {
+    margin-bottom: 1rem;
+}
+
+#tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag {
+    background: var(--primary);
+    color: var(--light);
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+}
+
+.financial-summary {
+    background: var(--dark);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.financial-summary h4 {
+    margin-bottom: 1rem;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.summary-item {
+    background: var(--darker);
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+.summary-item span {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 0.5rem;
+}
+
+.summary-item strong {
+    font-size: 1.2rem;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.modal.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-content {
+    background: var(--dark);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+}
+
+.modal-content.small {
+    max-width: 400px;
+}
+
+.close-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--gray);
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.close-modal:hover {
+    background: var(--darkest);
+    color: var(--light);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.priority-high {
+    color: var(--danger);
+}
+
+.priority-medium {
+    color: var(--warning);
+}
+
+.priority-low {
+    color: var(--success);
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .dashboard {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .transaction-item {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        gap: 0.5rem;
+    }
+    
+    .transaction-item .transaction-description {
+        grid-column: 1 / span 2;
+    }
+    
+    .transaction-item .transaction-actions {
+        grid-column: 2;
+        grid-row: 2;
+        justify-content: flex-end;
+    }
+    
+    .charts-container {
+        grid-template-columns: 1fr;
+    }
+}
