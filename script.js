@@ -26,7 +26,20 @@ class FinanceApp {
         this.initEventListeners();
         this.renderAll();
     }
+    class FinanceApp {
+  constructor() {
+    // ... (código existente)
     
+    // Verifica status das transações periodicamente
+    setInterval(() => {
+      this.transactionManager.updateTransactionStatuses();
+      this.uiUpdater.renderTransactions();
+    }, 24 * 60 * 60 * 1000); // Atualiza diariamente
+    
+    // Verifica ao iniciar
+    this.transactionManager.updateTransactionStatuses();
+  }
+}
     initElements() {
         // Form elements
         this.transactionForm = document.getElementById('transaction-form');
