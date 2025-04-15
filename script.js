@@ -371,7 +371,38 @@ class FinanceApp {
         this.transactionForm.reset();
         this.transactionDate.value = new Date().toISOString().split('T')[0];
     }
+    // No método addTransaction() da classe FinanceApp, adicione:
+const transaction = {
+    // ... campos existentes
+    status: dueDate ? 'pending' : 'paid', // Se tem data de vencimento, começa como pendente
+    paymentDate: !dueDate ? new Date().toISOString().split('T')[0] : null
+};
+
+// Adicione este novo método à classe:
+updateTransactionStatuses() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     
+    this.transactions.forEach(transaction => {
+        if (transaction.dueDate && transaction.status !== 'paid') {
+            const dueDate = new Date(transaction.dueDate);
+            transaction.status = dueDate < today ? 'overdue' : 'pending';
+        }
+    });
+    
+    this.saveData();
+}
+
+// Adicione este método para marcar como pago:
+markAsPaid(id) {
+    const transaction = this.transactions.find(t => t.id === id);
+    if (transaction) {
+        transaction.status = 'paid';
+        transaction.paymentDate = new Date().toISOString().split('T')[0];
+        this.saveData();
+        this.renderTransactions();
+    }
+}
     addGoal() {
         const description = this.goalDescription.value.trim();
         const targetDate = this.goalTargetDate.value;
