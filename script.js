@@ -590,7 +590,34 @@ calculateDailyBudget() {
         const searchTerm = this.searchTransactions.value.toLowerCase();
         
         let filteredTransactions = [...this.transactions];
-        
+        // No método renderTransactions(), atualize o HTML da transação:
+let statusBadge = '';
+if (transaction.dueDate) {
+    statusBadge = `<span class="transaction-status ${transaction.status}">
+        ${transaction.status === 'pending' ? 'Pendente' : 
+          transaction.status === 'overdue' ? 'Atrasado' : 'Pago'}
+    </span>`;
+    
+    if (transaction.status !== 'paid') {
+        statusBadge += `<button class="mark-paid-btn" data-id="${transaction.id}">
+            Marcar como pago
+        </button>`;
+    }
+}
+
+transactionElement.innerHTML = `
+    <!-- Código existente -->
+    ${statusBadge}
+    <!-- Restante do código -->
+`;
+
+// Adicione este evento listener para o botão "Marcar como pago"
+transactionElement.querySelectorAll('.mark-paid-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.markAsPaid(parseInt(btn.dataset.id));
+    });
+});
         // Apply filters
         if (typeFilter !== 'all') {
             filteredTransactions = filteredTransactions.filter(t => t.type === typeFilter);
