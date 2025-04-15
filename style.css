@@ -624,3 +624,34 @@ form {
         grid-template-columns: 1fr;
     }
 }
+/* Valores numéricos no painel */
+#current-balance,
+#total-income, 
+#total-expenses,
+#total-fixed {
+  color: #ef4444 !important; /* Vermelho */
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+/* Se quiser diferenciar receitas (verde) e despesas (vermelho) */
+#total-income {
+  color: #10b981 !important; /* Mantém verde apenas para receitas */
+}
+
+/* Para o card de orçamento diário */
+#daily-budget {
+  color: #ef4444 !important;
+}
+
+/* Se estiver usando classes específicas */
+.balance-card p,
+.balance-card strong {
+  color: #ef4444 !important;
+}
+
+/* Mantém verde apenas para receitas */
+.balance-card.income p, 
+.balance-card.income strong {
+  color: #10b981 !important;
+}
