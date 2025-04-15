@@ -655,3 +655,41 @@ form {
 .balance-card.income strong {
   color: #10b981 !important;
 }
+/* Estilos para os status */
+.transaction-item.pending {
+  border-left: 4px solid #f59e0b; /* Amarelo para pendente */
+}
+
+.transaction-item.overdue {
+  border-left: 4px solid #ef4444; /* Vermelho para atrasado */
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+.transaction-item.paid {
+  border-left: 4px solid #10b981; /* Verde para pago */
+  opacity: 0.8;
+}
+
+.transaction-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 1rem;
+}
+
+.mark-paid-btn {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+
+.mark-paid-btn:hover {
+  background-color: #0d9c6e;
+}
