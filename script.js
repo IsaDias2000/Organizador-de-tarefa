@@ -556,7 +556,33 @@ markAsPaid(id) {
         // Update balance color
         this.currentBalanceElement.style.color = this.currentBalance >= 0 ? 'var(--success)' : 'var(--danger)';
     }
+    // No método calculateTotals(), adicione:
+calculateDailyBudget() {
+    const today = new Date();
+    const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+    const daysRemaining = daysInMonth - today.getDate() + 1;
     
+    const monthlyIncome = this.transactions
+        .filter(t => t.type === 'income' && 
+               new Date(t.date).getMonth() === today.getMonth() &&
+               new Date(t.date).getFullYear() === today.getFullYear())
+        .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    
+    const monthlyExpenses = this.transactions
+        .filter(t => t.type === 'expense' && 
+               new Date(t.date).getMonth() === today.getMonth() &&
+               new Date(t.date).getFullYear() === today.getFullYear() &&
+               t.status === 'paid')
+        .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    
+    const balance = monthlyIncome - monthlyExpenses;
+    const dailyBudget = balance / daysRemaining;
+    
+    return {
+        daily: dailyBudget,
+        monthly: balance
+    };
+}
     renderTransactions() {
         const typeFilter = this.filterType.value;
         const categoryFilter = this.filterCategory.value;
