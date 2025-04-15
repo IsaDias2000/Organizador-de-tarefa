@@ -546,7 +546,10 @@ markAsPaid(id) {
             .reduce((sum, t) => sum + Math.abs(t.amount), 0);
         
         this.currentBalance = this.totalIncome - this.totalExpenses;
-        
+        // No método calculateTotals(), adicione:
+const budget = this.calculateDailyBudget();
+document.getElementById('daily-budget').textContent = this.formatCurrency(budget.daily);
+document.getElementById('monthly-balance').textContent = `Saldo mensal: ${this.formatCurrency(budget.monthly)}`;
         // Update UI
         this.currentBalanceElement.textContent = this.formatCurrency(this.currentBalance);
         this.totalIncomeElement.textContent = this.formatCurrency(this.totalIncome);
