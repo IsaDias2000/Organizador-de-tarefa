@@ -693,3 +693,52 @@ form {
 .mark-paid-btn:hover {
   background-color: #0d9c6e;
 }
+/* Adicione ao seu CSS existente */
+.balance-card.budget {
+    border-top: 4px solid #f59e0b;
+}
+
+.balance-card small {
+    font-size: 0.8rem;
+    color: var(--gray);
+    display: block;
+    margin-top: 0.3rem;
+}
+
+.transaction-item .transaction-status {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 1rem;
+    display: inline-block;
+    margin-top: 0.3rem;
+}
+
+.transaction-status.pending {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.transaction-status.overdue {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.transaction-status.paid {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.mark-paid-btn {
+    background: var(--success);
+    border: none;
+    color: white;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.3rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-left: 0.5rem;
+}
+
+.mark-paid-btn:hover {
+    background: #0d9c6e;
+}
