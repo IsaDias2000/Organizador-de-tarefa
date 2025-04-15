@@ -109,6 +109,17 @@ header h1 {
     border-top: 4px solid var(--purple);
 }
 
+.balance-card.budget {
+    border-top: 4px solid var(--warning);
+}
+
+.balance-card small {
+    font-size: 0.8rem;
+    color: var(--gray);
+    display: block;
+    margin-top: 0.3rem;
+}
+
 .tabs {
     display: flex;
     gap: 0.5rem;
@@ -309,6 +320,20 @@ form {
     border-left: 4px solid var(--purple);
 }
 
+.transaction-item.pending {
+    border-left: 4px solid var(--warning);
+}
+
+.transaction-item.overdue {
+    border-left: 4px solid var(--danger);
+    background-color: rgba(239, 68, 68, 0.05);
+}
+
+.transaction-item.paid {
+    border-left: 4px solid var(--success);
+    opacity: 0.8;
+}
+
 .transaction-item .transaction-actions {
     display: flex;
     gap: 0.5rem;
@@ -331,6 +356,45 @@ form {
 .transaction-item button:hover {
     background: var(--darkest);
     color: var(--light);
+}
+
+.transaction-status {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 1rem;
+    display: inline-block;
+    margin-top: 0.3rem;
+}
+
+.transaction-status.pending {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.transaction-status.overdue {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.transaction-status.paid {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.mark-paid-btn {
+    background: var(--success);
+    border: none;
+    color: white;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.3rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-left: 0.5rem;
+    transition: all 0.2s;
+}
+
+.mark-paid-btn:hover {
+    background: #0d9c6e;
 }
 
 .goals-container {
@@ -624,121 +688,30 @@ form {
         grid-template-columns: 1fr;
     }
 }
-/* Valores numéricos no painel */
+
 #current-balance,
 #total-income, 
 #total-expenses,
-#total-fixed {
-  color: #ef4444 !important; /* Vermelho */
-  font-weight: bold;
-  font-size: 1.5rem;
-}
-
-/* Se quiser diferenciar receitas (verde) e despesas (vermelho) */
-#total-income {
-  color: #10b981 !important; /* Mantém verde apenas para receitas */
-}
-
-/* Para o card de orçamento diário */
+#total-fixed,
 #daily-budget {
-  color: #ef4444 !important;
+    font-weight: bold;
+    font-size: 1.5rem;
 }
 
-/* Se estiver usando classes específicas */
-.balance-card p,
-.balance-card strong {
-  color: #ef4444 !important;
+#total-income {
+    color: var(--success) !important;
 }
 
-/* Mantém verde apenas para receitas */
+#total-expenses,
+#total-fixed {
+    color: var(--danger) !important;
+}
+
+#daily-budget {
+    color: var(--warning) !important;
+}
+
 .balance-card.income p, 
 .balance-card.income strong {
-  color: #10b981 !important;
-}
-/* Estilos para os status */
-.transaction-item.pending {
-  border-left: 4px solid #f59e0b; /* Amarelo para pendente */
-}
-
-.transaction-item.overdue {
-  border-left: 4px solid #ef4444; /* Vermelho para atrasado */
-  background-color: rgba(239, 68, 68, 0.05);
-}
-
-.transaction-item.paid {
-  border-left: 4px solid #10b981; /* Verde para pago */
-  opacity: 0.8;
-}
-
-.transaction-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.9rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 1rem;
-}
-
-.mark-paid-btn {
-  background-color: #10b981;
-  color: white;
-  border: none;
-  padding: 0.3rem 0.6rem;
-  border-radius: 0.3rem;
-  cursor: pointer;
-  font-size: 0.8rem;
-  transition: all 0.2s;
-}
-
-.mark-paid-btn:hover {
-  background-color: #0d9c6e;
-}
-/* Adicione ao seu CSS existente */
-.balance-card.budget {
-    border-top: 4px solid #f59e0b;
-}
-
-.balance-card small {
-    font-size: 0.8rem;
-    color: var(--gray);
-    display: block;
-    margin-top: 0.3rem;
-}
-
-.transaction-item .transaction-status {
-    font-size: 0.8rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 1rem;
-    display: inline-block;
-    margin-top: 0.3rem;
-}
-
-.transaction-status.pending {
-    background-color: rgba(245, 158, 11, 0.2);
-    color: #f59e0b;
-}
-
-.transaction-status.overdue {
-    background-color: rgba(239, 68, 68, 0.2);
-    color: #ef4444;
-}
-
-.transaction-status.paid {
-    background-color: rgba(16, 185, 129, 0.2);
-    color: #10b981;
-}
-
-.mark-paid-btn {
-    background: var(--success);
-    border: none;
-    color: white;
-    padding: 0.3rem 0.6rem;
-    border-radius: 0.3rem;
-    font-size: 0.8rem;
-    cursor: pointer;
-    margin-left: 0.5rem;
-}
-
-.mark-paid-btn:hover {
-    background: #0d9c6e;
+    color: var(--success) !important;
 }
