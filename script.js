@@ -1,278 +1,1108 @@
 class FinanceApp {
-  constructor() {
-    this.transactions = [];
-    this.fixedTransactions = [];
-    this.categories = [];
-    this.reminders = [];
-    this.currentBalance = 0;
-    this.nextPaymentDate = null;
-    this.dailyBudget = 0;
-    
-    this.initElements();
-    this.loadData();
-    this.initEventListeners();
-    this.renderAll();
-  }
-
-  // ... (métodos existentes até calculateTotals)
-
-  calculateDailyBudget() {
-    const nextPaymentInput = document.getElementById('next-payment-date');
-    const nextPaymentDate = new Date(nextPaymentInput.value);
-    
-    if (!nextPaymentDate || isNaN(nextPaymentDate.getTime())) {
-      alert('Defina uma data válida para o próximo pagamento');
-      return;
-    }
-    
-    this.nextPaymentDate = nextPaymentDate;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    // Calcula dias restantes
-    const timeDiff = nextPaymentDate - today;
-    const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-    
-    if (daysRemaining <= 0) {
-      alert('A data do próximo pagamento deve ser futura');
-      return;
-    }
-    
-    // Calcula orçamento diário
-    this.dailyBudget = this.currentBalance / daysRemaining;
-    
-    // Atualiza UI
-    document.getElementById('daily-budget').textContent = `R$ ${this.dailyBudget.toFixed(2)}`;
-    document.getElementById('days-remaining').textContent = `${daysRemaining} dias restantes`;
-    
-    // Salva no localStorage
-    localStorage.setItem('nextPaymentDate', nextPaymentInput.value);
-    localStorage.setItem('dailyBudget', this.dailyBudget.toString());
-  }
-
-  checkPaymentStatus() {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    this.transactions.forEach(transaction => {
-      if (transaction.dueDate) {
-        const dueDate = new Date(transaction.dueDate);
+    constructor() {
+        this.transactions = [];
+        this.goals = [];
+        this.reminders = [];
+        this.categories = [
+            { name: "Salário", type: "income", color: "#10b981" },
+            { name: "Investimentos", type: "income", color: "#06b6d4" },
+            { name: "Alimentação", type: "expense", color: "#ef4444" },
+            { name: "Moradia", type: "expense", color: "#f97316" },
+            { name: "Transporte", type: "expense", color: "#8b5cf6" },
+            { name: "Lazer", type: "expense", color: "#ec4899" },
+            { name: "Saúde", type: "expense", color: "#3b82f6" }
+        ];
         
-        if (transaction.paid && dueDate < today) {
-          // Se está marcado como pago mas venceu, marca como pendente
-          transaction.paid = false;
-          transaction.status = 'overdue';
-        } else if (!transaction.paid) {
-          // Atualiza status baseado na data
-          transaction.status = dueDate < today ? 'overdue' : 'pending';
+        this.currentBalance = 0;
+        this.totalIncome = 0;
+        this.totalExpenses = 0;
+        this.totalFixedExpenses = 0;
+        
+        this.balanceChart = null;
+        this.expenseChart = null;
+        
+        this.initElements();
+        this.loadData();
+        this.initEventListeners();
+        this.renderAll();
+    }
+    
+    initElements() {
+        // Form elements
+        this.transactionForm = document.getElementById('transaction-form');
+        this.goalForm = document.getElementById('goal-form');
+        this.reminderForm = document.getElementById('reminder-form');
+        this.categoryForm = document.getElementById('category-form');
+        
+        // Inputs
+        this.transactionType = document.getElementById('transaction-type');
+        this.transactionDate = document.getElementById('transaction-date');
+        this.transactionDescription = document.getElementById('transaction-description');
+        this.transactionAmount = document.getElementById('transaction-amount');
+        this.transactionCategory = document.getElementById('transaction-category');
+        this.transactionTags = document.getElementById('transaction-tags');
+        this.transactionDueDate = document.getElementById('transaction-due-date');
+        this.transactionParceled = document.getElementById('transaction-parceled');
+        this.transactionInstallments = document.getElementById('transaction-installments');
+        this.transactionFixed = document.getElementById('transaction-fixed');
+        
+        this.goalDescription = document.getElementById('goal-description');
+        this.goalTargetDate = document.getElementById('goal-target-date');
+        this.goalTargetAmount = document.getElementById('goal-target-amount');
+        this.goalInitialAmount = document.getElementById('goal-initial-amount');
+        
+        this.reminderDescription = document.getElementById('reminder-description');
+        this.reminderDate = document.getElementById('reminder-date');
+        this.reminderFrequency = document.getElementById('reminder-frequency');
+        this.reminderPriority = document.getElementById('reminder-priority');
+        
+        // Containers
+        this.transactionsContainer = document.getElementById('transactions-container');
+        this.goalsContainer = document.getElementById('goals-container');
+        this.activeRemindersContainer = document.getElementById('active-reminders-container');
+        this.completedRemindersContainer = document.getElementById('completed-reminders-container');
+        this.tagsContainer = document.getElementById('tags-container');
+        
+        // Summary elements
+        this.currentBalanceElement = document.getElementById('current-balance');
+        this.totalIncomeElement = document.getElementById('total-income');
+        this.totalExpensesElement = document.getElementById('total-expenses');
+        this.totalFixedElement = document.getElementById('total-fixed');
+        
+        this.highestIncomeElement = document.getElementById('highest-income');
+        this.highestExpenseElement = document.getElementById('highest-expense');
+        this.monthlyAverageElement = document.getElementById('monthly-average');
+        this.averageBalanceElement = document.getElementById('average-balance');
+        
+        // Filters
+        this.searchTransactions = document.getElementById('search-transactions');
+        this.filterType = document.getElementById('filter-type');
+        this.filterCategory = document.getElementById('filter-category');
+        this.filterMonth = document.getElementById('filter-month');
+        this.clearFilters = document.getElementById('clear-filters');
+        
+        this.filterReminderStatus = document.getElementById('filter-reminder-status');
+        this.filterReminderPriority = document.getElementById('filter-reminder-priority');
+        
+        // Reports
+        this.reportPeriod = document.getElementById('report-period');
+        this.generateReport = document.getElementById('generate-report');
+        
+        // Modals
+        this.categoryModal = document.getElementById('category-modal');
+        this.confirmModal = document.getElementById('confirm-modal');
+        this.closeModal = document.querySelector('.close-modal');
+        
+        // Buttons
+        this.addCategoryBtn = document.getElementById('add-category-btn');
+        this.clearForm = document.getElementById('clear-form');
+        this.clearCompleted = document.getElementById('clear-completed');
+        this.confirmYes = document.getElementById('confirm-yes');
+        this.confirmNo = document.getElementById('confirm-no');
+        this.exportData = document.getElementById('export-data');
+        this.importData = document.getElementById('import-data');
+        this.fileInput = document.getElementById('file-input');
+        
+        // Charts
+        this.balanceChartCtx = document.getElementById('balance-chart');
+        this.expenseChartCtx = document.getElementById('expense-chart');
+        
+        // Set current date as default
+        const today = new Date();
+        this.transactionDate.value = today.toISOString().split('T')[0];
+        this.goalTargetDate.value = today.toISOString().split('T')[0];
+        this.reminderDate.value = today.toISOString().split('T')[0];
+    }
+    
+    loadData() {
+        const savedData = localStorage.getItem('financeAppData');
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            this.transactions = data.transactions || [];
+            this.goals = data.goals || [];
+            this.reminders = data.reminders || [];
+            this.categories = data.categories || this.categories;
+            
+            // Update UI
+            this.updateCategoriesDropdown();
+            this.calculateTotals();
+            this.renderTransactions();
+            this.renderGoals();
+            this.renderReminders();
+            this.updateReports();
         }
-      }
-    });
-    
-    this.saveData();
-  }
-
-  // Modifique o método addTransaction para incluir vencimento
-  addTransaction() {
-    const type = this.elements.transactionType.value;
-    const date = this.elements.transactionDate.value;
-    const description = this.elements.transactionDescription.value.trim();
-    const amount = parseFloat(this.elements.transactionAmount.value);
-    const category = this.elements.transactionCategory.value;
-    const isParceled = this.elements.transactionParceled.checked;
-    const installments = isParceled ? parseInt(this.elements.transactionInstallments.value) : 1;
-    const isFixed = this.elements.transactionFixed.checked;
-    const dueDate = this.elements.transactionDueDate.value;
-
-    // Validação básica
-    if (!description || isNaN(amount)) {
-      alert('Preencha todos os campos corretamente!');
-      return;
     }
-
-    const newTransaction = {
-      id: Date.now(),
-      type,
-      date,
-      description,
-      amount: type === 'expense' ? -Math.abs(amount) : Math.abs(amount),
-      category,
-      installments,
-      installmentNumber: 1,
-      fixed: isFixed,
-      dueDate: isFixed || isParceled ? dueDate : null,
-      paid: false,
-      status: 'pending',
-      createdAt: new Date().toISOString()
-    };
-
-    // Adiciona transação principal
-    this.transactions.push(newTransaction);
-
-    // Se for parcelado, cria as parcelas futuras
-    if (isParceled && installments > 1) {
-      const transactionDate = new Date(date);
-      const dueDateObj = new Date(dueDate);
-      
-      for (let i = 2; i <= installments; i++) {
-        const nextMonth = new Date(transactionDate);
-        nextMonth.setMonth(transactionDate.getMonth() + (i - 1));
+    
+    saveData() {
+        const data = {
+            transactions: this.transactions,
+            goals: this.goals,
+            reminders: this.reminders,
+            categories: this.categories
+        };
+        localStorage.setItem('financeAppData', JSON.stringify(data));
+    }
+    
+    initEventListeners() {
+        // Transaction form
+        this.transactionForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.addTransaction();
+        });
         
-        const nextDueDate = new Date(dueDateObj);
-        nextDueDate.setMonth(dueDateObj.getMonth() + (i - 1));
+        // Goal form
+        this.goalForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.addGoal();
+        });
         
-        const installment = {
-          ...newTransaction,
-          id: Date.now() + i,
-          date: nextMonth.toISOString().split('T')[0],
-          dueDate: nextDueDate.toISOString().split('T')[0],
-          installmentNumber: i,
-          paid: false,
-          status: 'pending'
+        // Reminder form
+        this.reminderForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.addReminder();
+        });
+        
+        // Category form
+        this.categoryForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.addCategory();
+        });
+        
+        // Parceled checkbox
+        this.transactionParceled.addEventListener('change', () => {
+            this.transactionInstallments.disabled = !this.transactionParceled.checked;
+        });
+        
+        // Add category button
+        this.addCategoryBtn.addEventListener('click', () => {
+            this.categoryModal.classList.add('active');
+        });
+        
+        // Clear form button
+        this.clearForm.addEventListener('click', () => {
+            this.transactionForm.reset();
+            this.transactionDate.value = new Date().toISOString().split('T')[0];
+        });
+        
+        // Clear completed reminders
+        this.clearCompleted.addEventListener('click', () => {
+            this.showConfirmModal(
+                'Limpar lembretes concluídos',
+                'Tem certeza que deseja remover todos os lembretes concluídos?',
+                () => {
+                    this.reminders = this.reminders.filter(r => !r.completed);
+                    this.saveData();
+                    this.renderReminders();
+                }
+            );
+        });
+        
+        // Close modal
+        this.closeModal.addEventListener('click', () => {
+            this.categoryModal.classList.remove('active');
+        });
+        
+        // Modal backdrop click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+        
+        // Confirm modal actions
+        this.confirmYes.addEventListener('click', () => {
+            if (this.confirmCallback) {
+                this.confirmCallback();
+            }
+            this.confirmModal.classList.remove('active');
+        });
+        
+        this.confirmNo.addEventListener('click', () => {
+            this.confirmModal.classList.remove('active');
+        });
+        
+        // Filters
+        this.filterType.addEventListener('change', () => this.renderTransactions());
+        this.filterCategory.addEventListener('change', () => this.renderTransactions());
+        this.filterMonth.addEventListener('change', () => this.renderTransactions());
+        this.clearFilters.addEventListener('click', () => {
+            this.filterType.value = 'all';
+            this.filterCategory.value = 'all';
+            this.filterMonth.value = '';
+            this.searchTransactions.value = '';
+            this.renderTransactions();
+        });
+        
+        this.searchTransactions.addEventListener('input', () => this.renderTransactions());
+        
+        this.filterReminderStatus.addEventListener('change', () => this.renderReminders());
+        this.filterReminderPriority.addEventListener('change', () => this.renderReminders());
+        
+        // Reports
+        this.generateReport.addEventListener('click', () => this.updateReports());
+        
+        // Export/import data
+        this.exportData.addEventListener('click', () => this.exportAppData());
+        this.importData.addEventListener('click', () => this.fileInput.click());
+        this.fileInput.addEventListener('change', (e) => this.importAppData(e));
+        
+        // Tab switching
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                button.classList.add('active');
+                document.getElementById(button.dataset.tab).classList.add('active');
+                
+                // Refresh the tab content if needed
+                if (button.dataset.tab === 'reports') {
+                    this.updateReports();
+                }
+            });
+        });
+    }
+    
+    showConfirmModal(title, message, callback) {
+        document.getElementById('confirm-title').textContent = title;
+        document.getElementById('confirm-message').textContent = message;
+        this.confirmCallback = callback;
+        this.confirmModal.classList.add('active');
+    }
+    
+    updateCategoriesDropdown() {
+        this.transactionCategory.innerHTML = '<option value="">Selecione...</option>';
+        this.filterCategory.innerHTML = '<option value="all">Todas categorias</option>';
+        
+        this.categories.forEach(category => {
+            if (category.type === this.transactionType.value || category.type === 'both') {
+                const option = document.createElement('option');
+                option.value = category.name;
+                option.textContent = category.name;
+                option.style.color = category.color;
+                this.transactionCategory.appendChild(option);
+            }
+            
+            const filterOption = document.createElement('option');
+            filterOption.value = category.name;
+            filterOption.textContent = category.name;
+            filterOption.style.color = category.color;
+            this.filterCategory.appendChild(filterOption);
+        });
+    }
+    
+    addTransaction() {
+        const type = this.transactionType.value;
+        const date = this.transactionDate.value;
+        const description = this.transactionDescription.value.trim();
+        const amount = parseFloat(this.transactionAmount.value);
+        const category = this.transactionCategory.value;
+        const tags = this.transactionTags.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+        const dueDate = this.transactionDueDate.value;
+        const isParceled = this.transactionParceled.checked;
+        const installments = isParceled ? parseInt(this.transactionInstallments.value) : 1;
+        const isFixed = this.transactionFixed.checked;
+        
+        if (!description || isNaN(amount)) {
+            alert('Por favor, preencha todos os campos obrigatórios.');
+            return;
+        }
+        
+        const transaction = {
+            id: Date.now(),
+            type,
+            date,
+            description,
+            amount: type === 'income' ? amount : -amount,
+            category,
+            tags,
+            dueDate: dueDate || null,
+            isParceled,
+            installments: isParceled ? installments : 1,
+            isFixed,
+            createdAt: new Date().toISOString()
         };
         
-        this.transactions.push(installment);
-      }
-    }
-
-    // Se for fixa, adiciona à lista de contas fixas
-    if (isFixed) {
-      this.fixedTransactions.push({
-        ...newTransaction,
-        originalId: newTransaction.id
-      });
-    }
-
-    // Salva e atualiza a interface
-    this.saveData();
-    this.renderAll();
-    this.elements.transactionForm.reset();
-    
-    // Reseta para data atual
-    this.elements.transactionDate.value = new Date().toISOString().split('T')[0];
-  }
-
-  // Modifique o método renderTransactions para mostrar status
-  renderTransactions(transactions) {
-    this.elements.transactionsContainer.innerHTML = '';
-    
-    transactions.forEach(transaction => {
-      const li = document.createElement('li');
-      li.className = `transaction-item ${transaction.type} ${transaction.fixed ? 'fixed' : ''} ${transaction.installments > 1 ? 'parceled' : ''} ${transaction.status === 'overdue' ? 'overdue' : ''}`;
-      
-      // Ícone de status
-      const statusIcon = transaction.paid ? 'paid' : transaction.status;
-      const statusText = transaction.paid ? 'Pago' : 
-                       transaction.status === 'overdue' ? 'Atrasado' : 'Pendente';
-      
-      li.innerHTML = `
-        <div class="transaction-info">
-          <div class="transaction-description">${transaction.description}</div>
-          <div class="transaction-meta">
-            <span class="transaction-date">${new Date(transaction.date).toLocaleDateString()}</span>
-            ${transaction.dueDate ? `<span class="due-date">Vence: ${new Date(transaction.dueDate).toLocaleDateString()}</span>` : ''}
-            ${transaction.category ? `<span>${transaction.category}</span>` : ''}
-            ${transaction.installments > 1 ? `<span>Parcela ${transaction.installmentNumber}/${transaction.installments}</span>` : ''}
-          </div>
-        </div>
-        <div class="transaction-amount ${transaction.type}">
-          ${transaction.type === 'expense' ? '-' : ''}R$ ${Math.abs(transaction.amount).toFixed(2)}
-        </div>
-        <div class="transaction-actions">
-          <span class="status-badge ${statusIcon}">${statusText}</span>
-          <button class="toggle-paid-btn" data-id="${transaction.id}" title="${transaction.paid ? 'Marcar como pendente' : 'Marcar como pago'}">
-            <i class="fas ${transaction.paid ? 'fa-undo' : 'fa-check'}"></i>
-          </button>
-          <button class="delete-btn" data-id="${transaction.id}">
-            <i class="fas fa-trash"></i>
-          </button>
-        </div>
-      `;
-      
-      // Adiciona evento para marcar como pago/pendente
-      li.querySelector('.toggle-paid-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.togglePaidStatus(transaction.id);
-      });
-      
-      // Adiciona evento para deletar
-      li.querySelector('.delete-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.deleteTransaction(transaction.id);
-      });
-      
-      this.elements.transactionsContainer.appendChild(li);
-    });
-  }
-
-  togglePaidStatus(id) {
-    const transaction = this.transactions.find(t => t.id === id);
-    if (transaction) {
-      transaction.paid = !transaction.paid;
-      transaction.status = transaction.paid ? 'paid' : 
-                          new Date(transaction.dueDate) < new Date() ? 'overdue' : 'pending';
-      this.saveData();
-      this.renderAll();
-    }
-  }
-
-  // Modifique o initEventListeners para incluir o novo botão
-  initEventListeners() {
-    // ... (event listeners existentes)
-    
-    // Botão para calcular orçamento diário
-    document.getElementById('calculate-budget').addEventListener('click', () => {
-      this.calculateDailyBudget();
-    });
-    
-    // ... (restante dos event listeners existentes)
-  }
-
-  // Modifique o loadData para carregar os novos dados
-  loadData() {
-    this.transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-    this.fixedTransactions = JSON.parse(localStorage.getItem('fixedTransactions')) || [];
-    this.categories = JSON.parse(localStorage.getItem('categories')) || this.getDefaultCategories();
-    this.reminders = JSON.parse(localStorage.getItem('reminders')) || [];
-    
-    // Carrega dados do orçamento
-    const nextPaymentDate = localStorage.getItem('nextPaymentDate');
-    if (nextPaymentDate) {
-      document.getElementById('next-payment-date').value = nextPaymentDate;
+        this.transactions.push(transaction);
+        
+        // If parceled, create future installments
+        if (isParceled && installments > 1) {
+            const transactionDate = new Date(date);
+            const dueDateObj = dueDate ? new Date(dueDate) : transactionDate;
+            
+            for (let i = 2; i <= installments; i++) {
+                const nextDate = new Date(transactionDate);
+                nextDate.setMonth(transactionDate.getMonth() + (i - 1));
+                
+                const nextDueDate = new Date(dueDateObj);
+                nextDueDate.setMonth(dueDateObj.getMonth() + (i - 1));
+                
+                const installment = {
+                    ...transaction,
+                    id: Date.now() + i,
+                    date: nextDate.toISOString().split('T')[0],
+                    dueDate: nextDueDate.toISOString().split('T')[0],
+                    installmentNumber: i,
+                    isFirst: false
+                };
+                
+                this.transactions.push(installment);
+            }
+        }
+        
+        this.saveData();
+        this.calculateTotals();
+        this.renderTransactions();
+        this.transactionForm.reset();
+        this.transactionDate.value = new Date().toISOString().split('T')[0];
     }
     
-    this.dailyBudget = parseFloat(localStorage.getItem('dailyBudget')) || 0;
-    
-    // Verifica status de pagamento
-    this.checkPaymentStatus();
-    this.calculateTotals();
-    
-    // Atualiza UI do orçamento
-    if (this.dailyBudget > 0) {
-      document.getElementById('daily-budget').textContent = `R$ ${this.dailyBudget.toFixed(2)}`;
-      
-      const nextPaymentDate = new Date(document.getElementById('next-payment-date').value);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const daysRemaining = Math.ceil((nextPaymentDate - today) / (1000 * 60 * 60 * 24));
-      
-      if (daysRemaining > 0) {
-        document.getElementById('days-remaining').textContent = `${daysRemaining} dias restantes`;
-      }
+    addGoal() {
+        const description = this.goalDescription.value.trim();
+        const targetDate = this.goalTargetDate.value;
+        const targetAmount = parseFloat(this.goalTargetAmount.value);
+        const initialAmount = parseFloat(this.goalInitialAmount.value) || 0;
+        
+        if (!description || isNaN(targetAmount) || !targetDate) {
+            alert('Por favor, preencha todos os campos obrigatórios.');
+            return;
+        }
+        
+        const goal = {
+            id: Date.now(),
+            description,
+            targetDate,
+            targetAmount,
+            currentAmount: initialAmount,
+            createdAt: new Date().toISOString()
+        };
+        
+        this.goals.push(goal);
+        this.saveData();
+        this.renderGoals();
+        this.goalForm.reset();
+        this.goalTargetDate.value = new Date().toISOString().split('T')[0];
     }
-  }
-
-  // ... (restante dos métodos existentes)
+    
+    addReminder() {
+        const description = this.reminderDescription.value.trim();
+        const date = this.reminderDate.value;
+        const frequency = this.reminderFrequency.value;
+        const priority = this.reminderPriority.value;
+        
+        if (!description) {
+            alert('Por favor, insira uma descrição para o lembrete.');
+            return;
+        }
+        
+        const reminder = {
+            id: Date.now(),
+            description,
+            date,
+            frequency,
+            priority,
+            completed: false,
+            createdAt: new Date().toISOString()
+        };
+        
+        this.reminders.push(reminder);
+        this.saveData();
+        this.renderReminders();
+        this.reminderForm.reset();
+        this.reminderDate.value = new Date().toISOString().split('T')[0];
+    }
+    
+    addCategory() {
+        const name = document.getElementById('category-name').value.trim();
+        const type = document.getElementById('category-type').value;
+        const color = document.getElementById('category-color').value;
+        
+        if (!name) {
+            alert('Por favor, insira um nome para a categoria.');
+            return;
+        }
+        
+        if (this.categories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+            alert('Já existe uma categoria com este nome.');
+            return;
+        }
+        
+        const category = {
+            name,
+            type,
+            color
+        };
+        
+        this.categories.push(category);
+        this.saveData();
+        this.updateCategoriesDropdown();
+        this.categoryModal.classList.remove('active');
+        this.categoryForm.reset();
+    }
+    
+    deleteTransaction(id) {
+        this.showConfirmModal(
+            'Excluir lançamento',
+            'Tem certeza que deseja excluir este lançamento?',
+            () => {
+                this.transactions = this.transactions.filter(t => t.id !== id);
+                this.saveData();
+                this.calculateTotals();
+                this.renderTransactions();
+            }
+        );
+    }
+    
+    deleteGoal(id) {
+        this.showConfirmModal(
+            'Excluir meta',
+            'Tem certeza que deseja excluir esta meta?',
+            () => {
+                this.goals = this.goals.filter(g => g.id !== id);
+                this.saveData();
+                this.renderGoals();
+            }
+        );
+    }
+    
+    deleteReminder(id) {
+        this.showConfirmModal(
+            'Excluir lembrete',
+            'Tem certeza que deseja excluir este lembrete?',
+            () => {
+                this.reminders = this.reminders.filter(r => r.id !== id);
+                this.saveData();
+                this.renderReminders();
+            }
+        );
+    }
+    
+    toggleReminderStatus(id) {
+        const reminder = this.reminders.find(r => r.id === id);
+        if (reminder) {
+            reminder.completed = !reminder.completed;
+            this.saveData();
+            this.renderReminders();
+        }
+    }
+    
+    calculateTotals() {
+        this.totalIncome = this.transactions
+            .filter(t => t.type === 'income')
+            .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+        
+        this.totalExpenses = this.transactions
+            .filter(t => t.type === 'expense')
+            .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+        
+        this.totalFixedExpenses = this.transactions
+            .filter(t => t.type === 'expense' && t.isFixed)
+            .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+        
+        this.currentBalance = this.totalIncome - this.totalExpenses;
+        
+        // Update UI
+        this.currentBalanceElement.textContent = this.formatCurrency(this.currentBalance);
+        this.totalIncomeElement.textContent = this.formatCurrency(this.totalIncome);
+        this.totalExpensesElement.textContent = this.formatCurrency(this.totalExpenses);
+        this.totalFixedElement.textContent = this.formatCurrency(this.totalFixedExpenses);
+        
+        // Update balance color
+        this.currentBalanceElement.style.color = this.currentBalance >= 0 ? 'var(--success)' : 'var(--danger)';
+    }
+    
+    renderTransactions() {
+        const typeFilter = this.filterType.value;
+        const categoryFilter = this.filterCategory.value;
+        const monthFilter = this.filterMonth.value;
+        const searchTerm = this.searchTransactions.value.toLowerCase();
+        
+        let filteredTransactions = [...this.transactions];
+        
+        // Apply filters
+        if (typeFilter !== 'all') {
+            filteredTransactions = filteredTransactions.filter(t => t.type === typeFilter);
+        }
+        
+        if (categoryFilter !== 'all') {
+            filteredTransactions = filteredTransactions.filter(t => t.category === categoryFilter);
+        }
+        
+        if (monthFilter) {
+            const [year, month] = monthFilter.split('-');
+            filteredTransactions = filteredTransactions.filter(t => {
+                const transactionDate = new Date(t.date);
+                return transactionDate.getFullYear() === parseInt(year) && 
+                       transactionDate.getMonth() + 1 === parseInt(month);
+            });
+        }
+        
+        if (searchTerm) {
+            filteredTransactions = filteredTransactions.filter(t => 
+                t.description.toLowerCase().includes(searchTerm) ||
+                (t.tags && t.tags.some(tag => tag.toLowerCase().includes(searchTerm)))
+            );
+        }
+        
+        // Sort by date (newest first)
+        filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        // Render transactions
+        this.transactionsContainer.innerHTML = '';
+        
+        if (filteredTransactions.length === 0) {
+            this.transactionsContainer.innerHTML = '<div class="no-results">Nenhum lançamento encontrado</div>';
+            return;
+        }
+        
+        filteredTransactions.forEach(transaction => {
+            const transactionElement = document.createElement('div');
+            transactionElement.className = `transaction-item ${transaction.type} ${transaction.isFixed ? 'fixed' : ''}`;
+            
+            const formattedDate = new Date(transaction.date).toLocaleDateString('pt-BR');
+            const formattedAmount = this.formatCurrency(Math.abs(transaction.amount));
+            const amountClass = transaction.type === 'income' ? 'income' : 'expense';
+            
+            let dueDateInfo = '';
+            if (transaction.dueDate) {
+                const dueDate = new Date(transaction.dueDate);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                let dueStatus = '';
+                if (transaction.isFixed && dueDate < today) {
+                    dueStatus = '<span class="due-status overdue">(Atrasado)</span>';
+                } else if (transaction.dueDate) {
+                    dueStatus = `<span class="due-status">(Vence ${dueDate.toLocaleDateString('pt-BR')})</span>`;
+                }
+                
+                dueDateInfo = `<div class="due-date">${dueStatus}</div>`;
+            }
+            
+            let installmentInfo = '';
+            if (transaction.isParceled && transaction.installments > 1) {
+                installmentInfo = `<div class="installment">${transaction.installmentNumber || 1}/${transaction.installments}</div>`;
+            }
+            
+            transactionElement.innerHTML = `
+                <div class="transaction-description">
+                    ${transaction.description}
+                    ${dueDateInfo}
+                </div>
+                <div class="transaction-date">${formattedDate}</div>
+                <div class="transaction-amount ${amountClass}">
+                    ${transaction.type === 'income' ? '+' : '-'} ${formattedAmount}
+                </div>
+                <div class="transaction-actions">
+                    ${installmentInfo}
+                    <button class="delete-btn" data-id="${transaction.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            
+            transactionElement.querySelector('.delete-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.deleteTransaction(transaction.id);
+            });
+            
+            this.transactionsContainer.appendChild(transactionElement);
+        });
+    }
+    
+    renderGoals() {
+        this.goalsContainer.innerHTML = '';
+        
+        if (this.goals.length === 0) {
+            this.goalsContainer.innerHTML = '<div class="no-results">Nenhuma meta definida</div>';
+            return;
+        }
+        
+        this.goals.forEach(goal => {
+            const goalElement = document.createElement('div');
+            goalElement.className = 'goal-card';
+            
+            const progress = (goal.currentAmount / goal.targetAmount) * 100;
+            const daysRemaining = Math.ceil((new Date(goal.targetDate) - new Date()) / (1000 * 60 * 60 * 24));
+            
+            goalElement.innerHTML = `
+                <h3>${goal.description}</h3>
+                <div class="progress-bar">
+                    <div class="progress" style="width: ${Math.min(progress, 100)}%"></div>
+                </div>
+                <div class="goal-info">
+                    <span>${this.formatCurrency(goal.currentAmount)} de ${this.formatCurrency(goal.targetAmount)}</span>
+                    <span>${daysRemaining > 0 ? `${daysRemaining} dias restantes` : 'Prazo expirado'}</span>
+                </div>
+                <div class="goal-actions">
+                    <button class="delete-btn" data-id="${goal.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            
+            goalElement.querySelector('.delete-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.deleteGoal(goal.id);
+            });
+            
+            this.goalsContainer.appendChild(goalElement);
+        });
+    }
+    
+    renderReminders() {
+        const statusFilter = this.filterReminderStatus.value;
+        const priorityFilter = this.filterReminderPriority.value;
+        
+        let filteredReminders = [...this.reminders];
+        
+        // Apply filters
+        if (statusFilter !== 'all') {
+            filteredReminders = filteredReminders.filter(r => 
+                statusFilter === 'active' ? !r.completed : r.completed
+            );
+        }
+        
+        if (priorityFilter !== 'all') {
+            filteredReminders = filteredReminders.filter(r => r.priority === priorityFilter);
+        }
+        
+        // Sort by date (oldest first for active, newest first for completed)
+        filteredReminders.sort((a, b) => {
+            if (a.completed && b.completed) {
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            } else if (!a.completed && !b.completed) {
+                return new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt);
+            }
+            return a.completed ? 1 : -1;
+        });
+        
+        // Render reminders
+        this.activeRemindersContainer.innerHTML = '';
+        this.completedRemindersContainer.innerHTML = '';
+        
+        const activeReminders = filteredReminders.filter(r => !r.completed);
+        const completedReminders = filteredReminders.filter(r => r.completed);
+        
+        if (activeReminders.length === 0) {
+            this.activeRemindersContainer.innerHTML = '<div class="no-results">Nenhum lembrete ativo</div>';
+        } else {
+            activeReminders.forEach(reminder => {
+                const reminderElement = this.createReminderElement(reminder);
+                this.activeRemindersContainer.appendChild(reminderElement);
+            });
+        }
+        
+        if (completedReminders.length === 0) {
+            this.completedRemindersContainer.innerHTML = '<div class="no-results">Nenhum lembrete concluído</div>';
+        } else {
+            completedReminders.forEach(reminder => {
+                const reminderElement = this.createReminderElement(reminder);
+                this.completedRemindersContainer.appendChild(reminderElement);
+            });
+        }
+    }
+    
+    createReminderElement(reminder) {
+        const reminderElement = document.createElement('div');
+        reminderElement.className = `reminder-item ${reminder.completed ? 'completed' : ''} priority-${reminder.priority}`;
+        
+        const formattedDate = reminder.date ? new Date(reminder.date).toLocaleDateString('pt-BR') : 'Sem data';
+        const frequencyText = {
+            once: 'Uma vez',
+            daily: 'Diário',
+            weekly: 'Semanal',
+            monthly: 'Mensal'
+        }[reminder.frequency];
+        
+        reminderElement.innerHTML = `
+            <label>
+                <input type="checkbox" ${reminder.completed ? 'checked' : ''}>
+                <span class="reminder-text">${reminder.description}</span>
+            </label>
+            <div class="reminder-details">
+                <span class="reminder-date">${formattedDate}</span>
+                <span class="reminder-frequency">${frequencyText}</span>
+                <span class="reminder-priority ${reminder.priority}">
+                    ${reminder.priority === 'high' ? 'Alta' : 
+                      reminder.priority === 'medium' ? 'Média' : 'Baixa'}
+                </span>
+            </div>
+            <div class="reminder-actions">
+                <button class="delete-btn" data-id="${reminder.id}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+        
+        const checkbox = reminderElement.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener('change', () => {
+            this.toggleReminderStatus(reminder.id);
+        });
+        
+        reminderElement.querySelector('.delete-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.deleteReminder(reminder.id);
+        });
+        
+        return reminderElement;
+    }
+    
+    updateReports() {
+        const period = this.reportPeriod.value;
+        let filteredTransactions = [];
+        const today = new Date();
+        
+        switch (period) {
+            case 'current-month':
+                filteredTransactions = this.transactions.filter(t => {
+                    const date = new Date(t.date);
+                    return date.getMonth() === today.getMonth() && 
+                           date.getFullYear() === today.getFullYear();
+                });
+                break;
+                
+            case 'last-month':
+                const lastMonth = new Date(today);
+                lastMonth.setMonth(lastMonth.getMonth() - 1);
+                
+                filteredTransactions = this.transactions.filter(t => {
+                    const date = new Date(t.date);
+                    return date.getMonth() === lastMonth.getMonth() && 
+                           date.getFullYear() === lastMonth.getFullYear();
+                });
+                break;
+                
+            case 'last-3-months':
+                const threeMonthsAgo = new Date(today);
+                threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+                
+                filteredTransactions = this.transactions.filter(t => {
+                    const date = new Date(t.date);
+                    return date >= threeMonthsAgo && date <= today;
+                });
+                break;
+                
+            case 'current-year':
+                filteredTransactions = this.transactions.filter(t => {
+                    const date = new Date(t.date);
+                    return date.getFullYear() === today.getFullYear();
+                });
+                break;
+                
+            default:
+                filteredTransactions = [...this.transactions];
+        }
+        
+        // Update charts
+        this.updateBalanceChart(filteredTransactions);
+        this.updateExpenseChart(filteredTransactions);
+        
+        // Update tags cloud
+        this.updateTagsCloud(filteredTransactions);
+        
+        // Update financial summary
+        this.updateFinancialSummary(filteredTransactions);
+    }
+    
+    updateBalanceChart(transactions) {
+        const income = transactions
+            .filter(t => t.type === 'income')
+            .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+            
+        const expenses = transactions
+            .filter(t => t.type === 'expense')
+            .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+        
+        if (this.balanceChart) {
+            this.balanceChart.destroy();
+        }
+        
+        this.balanceChart = new Chart(this.balanceChartCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Receitas', 'Despesas'],
+                datasets: [{
+                    data: [income, expenses],
+                    backgroundColor: ['#10b981', '#ef4444'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+    
+    updateExpenseChart(transactions) {
+        const expensesByCategory = {};
+        
+        transactions
+            .filter(t => t.type === 'expense')
+            .forEach(t => {
+                if (!expensesByCategory[t.category || 'Outros']) {
+                    expensesByCategory[t.category || 'Outros'] = 0;
+                }
+                expensesByCategory[t.category || 'Outros'] += Math.abs(t.amount);
+            });
+        
+        const categories = Object.keys(expensesByCategory);
+        const amounts = Object.values(expensesByCategory);
+        
+        // Get colors for each category
+        const backgroundColors = categories.map(category => {
+            const cat = this.categories.find(c => c.name === category);
+            return cat ? cat.color : '#94a3b8';
+        });
+        
+        if (this.expenseChart) {
+            this.expenseChart.destroy();
+        }
+        
+        this.expenseChart = new Chart(this.expenseChartCtx, {
+            type: 'bar',
+            data: {
+                labels: categories,
+                datasets: [{
+                    label: 'Despesas por Categoria',
+                    data: amounts,
+                    backgroundColor: backgroundColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+    
+    updateTagsCloud(transactions) {
+        const tagsCount = {};
+        
+        transactions.forEach(t => {
+            if (t.tags && t.tags.length > 0) {
+                t.tags.forEach(tag => {
+                    if (!tagsCount[tag]) {
+                        tagsCount[tag] = 0;
+                    }
+                    tagsCount[tag]++;
+                });
+            }
+        });
+        
+        const sortedTags = Object.entries(tagsCount)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 15); // Show only top 15 tags
+        
+        this.tagsContainer.innerHTML = '';
+        
+        if (sortedTags.length === 0) {
+            this.tagsContainer.innerHTML = '<div class="no-results">Nenhuma tag utilizada</div>';
+            return;
+        }
+        
+        // Find max count for scaling
+        const maxCount = Math.max(...sortedTags.map(t => t[1]));
+        
+        sortedTags.forEach(([tag, count]) => {
+            const tagElement = document.createElement('div');
+            tagElement.className = 'tag';
+            
+            // Scale font size based on frequency (between 0.8rem and 1.6rem)
+            const fontSize = 0.8 + (0.8 * (count / maxCount));
+            tagElement.style.fontSize = `${fontSize}rem`;
+            
+            tagElement.textContent = tag;
+            this.tagsContainer.appendChild(tagElement);
+        });
+    }
+    
+    updateFinancialSummary(transactions) {
+        const incomeTransactions = transactions.filter(t => t.type === 'income');
+        const expenseTransactions = transactions.filter(t => t.type === 'expense');
+        
+        // Highest income
+        const highestIncome = incomeTransactions.length > 0 ? 
+            Math.max(...incomeTransactions.map(t => Math.abs(t.amount))) : 0;
+        
+        // Highest expense
+        const highestExpense = expenseTransactions.length > 0 ? 
+            Math.max(...expenseTransactions.map(t => Math.abs(t.amount))) : 0;
+        
+        // Monthly average (based on the selected period)
+        let monthlyAverage = 0;
+        if (transactions.length > 0) {
+            const months = this.getMonthsInPeriod();
+            const total = transactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+            monthlyAverage = total / months;
+        }
+        
+        // Average balance
+        let averageBalance = 0;
+        if (transactions.length > 0) {
+            const balances = this.calculateMonthlyBalances();
+            averageBalance = balances.reduce((sum, b) => sum + b.balance, 0) / balances.length;
+        }
+        
+        // Update UI
+        this.highestIncomeElement.textContent = this.formatCurrency(highestIncome);
+        this.highestExpenseElement.textContent = this.formatCurrency(highestExpense);
+        this.monthlyAverageElement.textContent = this.formatCurrency(monthlyAverage);
+        this.averageBalanceElement.textContent = this.formatCurrency(averageBalance);
+    }
+    
+    getMonthsInPeriod() {
+        const period = this.reportPeriod.value;
+        const today = new Date();
+        
+        switch (period) {
+            case 'current-month':
+            case 'last-month':
+                return 1;
+            case 'last-3-months':
+                return 3;
+            case 'current-year':
+                return today.getMonth() + 1;
+            default:
+                return 1;
+        }
+    }
+    
+    calculateMonthlyBalances() {
+        const balances = [];
+        const allMonths = this.getMonthsWithTransactions();
+        
+        let runningBalance = 0;
+        
+        allMonths.forEach(month => {
+            const monthlyTransactions = this.transactions.filter(t => {
+                const date = new Date(t.date);
+                return date.getFullYear() === month.year && 
+                       date.getMonth() === month.month;
+            });
+            
+            const monthlyIncome = monthlyTransactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+                
+            const monthlyExpenses = monthlyTransactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+            
+            runningBalance += (monthlyIncome - monthlyExpenses);
+            
+            balances.push({
+                year: month.year,
+                month: month.month,
+                balance: runningBalance
+            });
+        });
+        
+        return balances;
+    }
+    
+    getMonthsWithTransactions() {
+        const monthsSet = new Set();
+        
+        this.transactions.forEach(t => {
+            const date = new Date(t.date);
+            monthsSet.add(`${date.getFullYear()}-${date.getMonth()}`);
+        });
+        
+        return Array.from(monthsSet)
+            .map(m => {
+                const [year, month] = m.split('-');
+                return { year: parseInt(year), month: parseInt(month) };
+            })
+            .sort((a, b) => {
+                if (a.year !== b.year) return a.year - b.year;
+                return a.month - b.month;
+            });
+    }
+    
+    exportAppData() {
+        const data = {
+            transactions: this.transactions,
+            goals: this.goals,
+            reminders: this.reminders,
+            categories: this.categories,
+            exportedAt: new Date().toISOString()
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `backup-finance-app-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+    
+    importAppData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                
+                this.showConfirmModal(
+                    'Importar dados',
+                    'Isso substituirá todos os dados atuais. Continuar?',
+                    () => {
+                        this.transactions = data.transactions || [];
+                        this.goals = data.goals || [];
+                        this.reminders = data.reminders || [];
+                        this.categories = data.categories || this.categories;
+                        
+                        this.saveData();
+                        this.renderAll();
+                        
+                        alert('Dados importados com sucesso!');
+                    }
+                );
+            } catch (error) {
+                alert('Erro ao importar arquivo. Certifique-se de que é um backup válido.');
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = ''; // Reset input
+    }
+    
+    formatCurrency(value) {
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(value || 0);
+    }
+    
+    renderAll() {
+        this.updateCategoriesDropdown();
+        this.calculateTotals();
+        this.renderTransactions();
+        this.renderGoals();
+        this.renderReminders();
+        this.updateReports();
+    }
 }
 
-// Inicializa a aplicação
+// Initialize the app when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  const app = new FinanceApp();
-  
-  // Verifica contas fixas diariamente
-  setInterval(() => {
-    app.checkFixedTransactions();
-    app.checkPaymentStatus();
-    app.calculateTotals();
-  }, 24 * 60 * 60 * 1000);
+    const app = new FinanceApp();
 });
