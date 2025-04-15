@@ -36,11 +36,6 @@
                 <h3>Despesas Fixas</h3>
                 <p id="total-fixed">R$ 0,00</p>
             </div>
-            <div class="balance-card budget">
-                <h3>Orçamento Diário</h3>
-                <p id="daily-budget">R$ 0,00</p>
-                <small id="monthly-balance">Saldo mensal: R$ 0,00</small>
-            </div>
         </div>
 
         <nav class="tabs">
@@ -51,6 +46,7 @@
         </nav>
 
         <main>
+            <!-- Aba de Lançamentos -->
             <section id="transactions" class="tab-content active">
                 <form id="transaction-form">
                     <div class="form-row">
@@ -156,6 +152,7 @@
                 </div>
             </section>
 
+            <!-- Aba de Metas -->
             <section id="goals" class="tab-content">
                 <form id="goal-form">
                     <div class="form-row">
@@ -187,9 +184,12 @@
                     </div>
                 </form>
 
-                <div class="goals-container" id="goals-container"></div>
+                <div class="goals-container" id="goals-container">
+                    <!-- Metas serão renderizadas aqui -->
+                </div>
             </section>
 
+            <!-- Aba de Lembretes -->
             <section id="reminders" class="tab-content">
                 <form id="reminder-form">
                     <div class="form-row">
@@ -259,6 +259,7 @@
                 </div>
             </section>
 
+            <!-- Aba de Relatórios -->
             <section id="reports" class="tab-content">
                 <div class="report-controls">
                     <select id="report-period">
@@ -312,6 +313,7 @@
             </section>
         </main>
 
+        <!-- Modal de Categorias -->
         <div id="category-modal" class="modal">
             <div class="modal-content">
                 <span class="close-modal">&times;</span>
@@ -339,6 +341,7 @@
             </div>
         </div>
 
+        <!-- Modal de Confirmação -->
         <div id="confirm-modal" class="modal">
             <div class="modal-content small">
                 <h3 id="confirm-title">Confirmar ação</h3>
