@@ -60,9 +60,9 @@ class FinanceApp {
       
       // Relatórios
       reportPeriodSelect: document.getElementById('report-period-select'),
-      
-      // Sumários
       reportPeriodSelect: document.getElementById('report-period-select')
+      // Sumários
+    
       currentBalance: document.getElementById('current-balance'),
       totalIncome: document.getElementById('total-income'),
       totalExpenses: document.getElementById('total-expenses'),
