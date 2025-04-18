@@ -693,3 +693,23 @@ form {
 .mark-paid-btn:hover {
   background-color: #0d9c6e;
 }
+.transaction-list {
+  background: var(--dark);
+  border-radius: 0.5rem;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--darkest);
+}
+
+.transaction-item.expense .transaction-amount {
+  color: var(--danger);
+}
+
+.transaction-item.income .transaction-amount {
+  color: var(--success);
+}
