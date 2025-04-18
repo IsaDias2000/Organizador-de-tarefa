@@ -971,7 +971,13 @@ class FinanceApp {
 // Inicializa a aplicação quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => {
   const app = new FinanceApp();
+    // Forçar atualização inicial
+  app.renderAll();
+  app.updateBalance();
   
+  // Atualizar a cada 5 segundos (apenas para teste)
+  setInterval(() => app.renderAll(), 5000);
+});
   // Verifica contas fixas diariamente
   setInterval(() => app.checkFixedTransactions(), 24 * 60 * 60 * 1000);
 });
