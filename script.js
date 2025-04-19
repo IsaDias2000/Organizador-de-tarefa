@@ -60,7 +60,7 @@ class FinanceApp {
       
 
       // Sumários
-      reportPeriodSelect: document.getElementById('report-period-select'),
+      let reportPeriodSelect = document.getElementById('reportPeriodSelect');
       currentBalance: document.getElementById('current-balance'),
       totalIncome: document.getElementById('total-income'),
       totalExpenses: document.getElementById('total-expenses'),
