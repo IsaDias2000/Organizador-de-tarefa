@@ -209,16 +209,13 @@ class FinanceApp {
   }
 
   switchTab(button) {
-    // Remove classe active de todas as tabs
     this.elements.tabButtons.forEach(btn => btn.classList.remove('active'));
     this.elements.tabContents.forEach(content => content.classList.remove('active'));
 
-    // Adiciona a classe active à tab selecionada
     button.classList.add('active');
     const tabId = button.getAttribute('data-tab');
     document.getElementById(tabId).classList.add('active');
 
-    // Atualiza conteúdo de acordo com a tab
     if (tabId === 'fixed') {
       this.filterFixedTransactions();
     } else if (tabId === 'reminders') {
@@ -233,7 +230,8 @@ class FinanceApp {
     const date = this.elements.transactionDate.value;
     const description = this.elements.transactionDescription.value.trim();
     const amount = parseFloat(this.elements.transactionAmount.value);
-    const category = this.elements.transactionCategory.value;
+    // Agora a categoria é opcional; se não for selecionada, ficará como string vazia.
+    const category = this.elements.transactionCategory.value || "";
     const isParceled = this.elements.transactionParceled.checked;
     const installments = isParceled ? parseInt(this.elements.transactionInstallments.value) : 1;
     const isFixed = this.elements.transactionFixed.checked;
@@ -248,8 +246,9 @@ class FinanceApp {
       type,
       date,
       description,
+      // Se for despesa, garante o valor negativo; se for receita, valor positivo.
       amount: type === 'expense' ? -Math.abs(amount) : Math.abs(amount),
-      category,
+      category, // Campo opcional
       installments,
       installmentNumber: 1,
       fixed: isFixed,
@@ -259,7 +258,6 @@ class FinanceApp {
 
     this.transactions.push(newTransaction);
 
-    // Se parcelado, cria as demais parcelas
     if (isParceled && installments > 1) {
       const transactionDate = new Date(date);
       for (let i = 2; i <= installments; i++) {
@@ -411,7 +409,9 @@ class FinanceApp {
   }
 
   updateCategoriesDropdowns() {
-    if (!this.elements.transactionCategory || !this.elements.filterCategory || !this.elements.filterFixedCategory) return;
+    if (!this.elements.transactionCategory ||
+        !this.elements.filterCategory ||
+        !this.elements.filterFixedCategory) return;
 
     this.elements.transactionCategory.innerHTML = '<option value="">Sem categoria</option>';
     this.elements.filterCategory.innerHTML = '<option value="all">Todas Categorias</option>';
@@ -457,7 +457,6 @@ class FinanceApp {
         return date.getFullYear() === parseInt(year) && (date.getMonth() + 1) === parseInt(monthNum);
       });
     }
-    // Ordena por data decrescente
     filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
     this.updateTransactionsSummaries(filtered);
     this.renderTransactions(filtered);
@@ -588,7 +587,6 @@ class FinanceApp {
     const activeReminders = this.reminders.filter(r => !r.completed);
     const completedReminders = this.reminders.filter(r => r.completed);
 
-    // Renderização dos lembretes ativos
     activeReminders.forEach(reminder => {
       const li = document.createElement('li');
       li.className = 'reminder-item';
@@ -613,7 +611,6 @@ class FinanceApp {
       this.elements.activeReminders.appendChild(li);
     });
 
-    // Renderização dos lembretes concluídos
     completedReminders.forEach(reminder => {
       const li = document.createElement('li');
       li.className = 'reminder-item completed';
@@ -699,9 +696,6 @@ class FinanceApp {
       default:
         transactions = this.transactions;
     }
-    // Aqui você pode atualizar elementos específicos do relatório
-
-    // Atualiza os gráficos com as transações filtradas
     this.updateBalanceChart(transactions);
     this.updateCategoriesChart(transactions);
   }
@@ -827,16 +821,11 @@ class FinanceApp {
   }
 }
 
-// Inicializa a aplicação quando o DOM estiver completamente carregado
 document.addEventListener('DOMContentLoaded', () => {
   const app = new FinanceApp();
-  // Atualiza inicialmente a interface
   app.renderAll();
   app.updateBalance();
 
-  // Exemplo: atualização a cada 5 segundos (para testes; ajuste conforme necessário)
   setInterval(() => app.renderAll(), 5000);
-
-  // Verifica contas fixas diariamente
   setInterval(() => app.checkFixedTransactions(), 24 * 60 * 60 * 1000);
 });
