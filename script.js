@@ -257,7 +257,7 @@ class FinanceApp {
     }
 
     const newTransaction = {
-      id: Date.now(),
+      id: Date.now() + Math.floor(Math.random() * 1000),
       type,
       date,
       description,
@@ -596,10 +596,9 @@ class FinanceApp {
     }
     
     // Filtra por categoria
-    if (category !== 'all') {
-      filtered = filtered.filter(t => t.category === category);
-    }
-    
+  if (category !== 'all') {
+  filtered = filtered.filter(t => t.category === category);
+}
     // Atualiza sumários
     this.updateFixedSummaries(filtered);
     
