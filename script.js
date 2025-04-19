@@ -53,7 +53,6 @@ class FinanceApp {
     currentBalance: document.getElementById('current-balance'),
     totalIncome: document.getElementById('total-income'),
     totalExpenses: document.getElementById('total-expenses'),
-    transactionsContainer: document.getElementById('transactions-container'),
     goalsContainer: document.getElementById('goals-container'),
     balanceChart: document.getElementById('balance-chart'),
     expenseChart: document.getElementById('expense-chart')
@@ -810,19 +809,38 @@ class FinanceApp {
     }
     
     // Atualiza gráficos
-    updateBalanceChart(transactions) {
+updateBalanceChart(transactions) {
   const income = transactions
     .filter(t => t.type === 'income')
-    .reduce((sum, t) => sum + t.amount, 0);
+    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
   const expenses = transactions
     .filter(t => t.type === 'expense')
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
-  // Destrua o gráfico anterior se existir
+  // Destroi o gráfico existente
   if (this.balanceChartInstance) {
     this.balanceChartInstance.destroy();
   }
+
+  const ctx = this.elements.balanceChart.getContext('2d');
+  this.balanceChartInstance = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Receitas', 'Despesas'],
+      datasets: [{
+        data: [income, expenses],
+        backgroundColor: ['#10b981', '#ef4444']
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+}
 
   const ctx = this.elements.balanceChart.getContext('2d');
   this.balanceChartInstance = new Chart(ctx, {
@@ -870,12 +888,6 @@ class FinanceApp {
       return date >= threeMonthsAgo && date <= currentDate;
     });
   }
-
-  updateBalanceChart(transactions) {
-    const income = transactions
-      .filter(t => t.type === 'income')
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-    
     const expenses = transactions
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + Math.abs(t.amount), 0);
