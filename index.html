@@ -50,6 +50,7 @@
             <section id="transactions" class="tab-content active">
                 <form id="transaction-form">
                     <div class="form-row">
+                        <canvas id="main-balance-chart"></canvas>
                         <div class="form-group">
                             <label for="transaction-type">Tipo</label>
                             <select id="transaction-type" required>
@@ -281,6 +282,8 @@
                     <div class="chart-card">
                         <h4>Receitas vs Despesas</h4>
                         <canvas id="balance-chart"></canvas>
+                        <canvas id="reports-balance-chart"></canvas>
+                        <canvas id="reports-categories-chart"></canvas>
                     </div>
                     <div class="chart-card">
                         <h4>Distribuição de Despesas</h4>
