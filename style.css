@@ -717,3 +717,7 @@ form {
   border-left: 4px solid #ef4444;
   animation: pulse-alert 1.5s infinite;
 }
+.category.no-category {
+  color: #666;
+  font-style: italic;
+}
