@@ -232,14 +232,15 @@ this.elements.transactionDate.value = localDate.toISOString().split('T')[0];
     const amount = parseFloat(this.elements.transactionAmount.value);
     // Agora a categoria é opcional; se não for selecionada, ficará como string vazia.
     const category = this.elements.transactionCategory.value || "";
+    const category = this.elements.transactionCategory.value || 'Sem Categoria'; // Define valor padrão
     const isParceled = this.elements.transactionParceled.checked;
     const installments = isParceled ? parseInt(this.elements.transactionInstallments.value) : 1;
     const isFixed = this.elements.transactionFixed.checked;
 
-    if (!description || isNaN(amount)) {
-      alert('Preencha todos os campos corretamente!');
-      return;
-    }
+if (!description || isNaN(amount)) { // Mantenha apenas as validações essenciais
+  alert('Preencha todos os campos obrigatórios!');
+  return;
+}
 
     const newTransaction = {
       id: Date.now() + Math.floor(Math.random() * 1000),
