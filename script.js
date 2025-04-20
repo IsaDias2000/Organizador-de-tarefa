@@ -58,7 +58,11 @@ class FinanceApp {
       filterFixedType: document.getElementById('filter-fixed-type'),
       filterFixedStatus: document.getElementById('filter-fixed-status'),
       filterFixedCategory: document.getElementById('filter-fixed-category'),
-
+      this.elements.filterCategory.innerHTML = `
+      <option value="all">Todas Categorias</option>
+      <option value="none">Sem Categoria</option>
+      ${this.categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}
+      `;
       // Sumários / Relatórios
       reportPeriodSelect: document.getElementById('reportPeriodSelect'),
       fixedExpensesSummary: document.getElementById('fixed-expenses-summary'),
