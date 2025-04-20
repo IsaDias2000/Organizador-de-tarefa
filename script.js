@@ -158,7 +158,13 @@ this.elements.transactionDate.value = localDate.toISOString().split('T')[0];
     this.elements.filterFixedType.addEventListener('change', () => this.filterFixedTransactions());
     this.elements.filterFixedStatus.addEventListener('change', () => this.filterFixedTransactions());
     this.elements.filterFixedCategory.addEventListener('change', () => this.filterFixedTransactions());
-
+    if (category !== 'all') {
+  if (category === 'none') {
+    filtered = filtered.filter(t => !t.category || t.category === 'Sem Categoria');
+  } else {
+    filtered = filtered.filter(t => t.category === category);
+  }
+}
     // Atualiza os relatórios ao alterar o período
     if (this.elements.reportPeriodSelect) {
       this.elements.reportPeriodSelect.addEventListener('change', () => this.updateReports());
