@@ -447,6 +447,19 @@ if (!description || isNaN(amount)) { // Mantenha apenas as validações essencia
     const type = this.elements.filterType.value;
     const category = this.elements.filterCategory.value;
     const month = this.elements.filterMonth.value;
+if (category !== 'all') {
+  if (category === 'none') {
+    filtered = filtered.filter(t => !t.category || t.category === 'Sem Categoria');
+  } else {
+    filtered = filtered.filter(t => t.category === category);
+  }
+}this.elements.filterCategory.innerHTML = `
+  <option value="all">Todas Categorias</option>
+  <option value="none">Sem Categoria</option>
+  ${this.categories.map(c => `
+    <option value="${c.name}">${c.name}</option>
+  `).join('')}
+`;
 
     if (type !== 'all') {
       filtered = filtered.filter(t => t.type === type);
@@ -746,6 +759,7 @@ if (!description || isNaN(amount)) { // Mantenha apenas as validações essencia
     const expenses = transactions
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+      const category = expense.category || 'Sem Categoria';
 
     if (this.balanceChartInstance) {
       this.balanceChartInstance.destroy();
