@@ -72,7 +72,8 @@ class FinanceApp {
       // Elementos dos Gráficos
       balanceChart: document.getElementById('balance-chart'),
       categoriesChart: document.getElementById('categories-chart'),
-
+      this.categories = [
+      { name: 'Sem Categoria', type: 'both', color: '#cccccc' },
       // Botões
       addCategoryBtn: document.getElementById('add-category-btn'),
       themeToggle: document.getElementById('theme-toggle'),
