@@ -713,3 +713,7 @@ form {
 .transaction-item.income .transaction-amount {
   color: var(--success);
 }
+.transaction-item.overdue {
+  border-left: 4px solid #ef4444;
+  animation: pulse-alert 1.5s infinite;
+}
