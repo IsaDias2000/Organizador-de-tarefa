@@ -232,8 +232,7 @@ this.elements.transactionDate.value = localDate.toISOString().split('T')[0];
     const description = this.elements.transactionDescription.value.trim();
     const amount = parseFloat(this.elements.transactionAmount.value);
     // Agora a categoria é opcional; se não for selecionada, ficará como string vazia.
-    const category = this.elements.transactionCategory.value || "";
-    const category = this.elements.transactionCategory.value || 'Sem Categoria'; // Define valor padrão
+    const category = this.elements.transactionCategory.value || 'Sem Categoria'; // Única declaração
     const isParceled = this.elements.transactionParceled.checked;
     const installments = isParceled ? parseInt(this.elements.transactionInstallments.value) : 1;
     const isFixed = this.elements.transactionFixed.checked;
