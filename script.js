@@ -92,11 +92,10 @@ class FinanceApp {
     };
 
     // Configura data padrão para a transação
-    const today = new Date();
-    if (this.elements.transactionDate) {
-      this.elements.transactionDate.value = today.toISOString().split('T')[0];
-    }
-  }
+const today = new Date();
+const localDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000));
+this.elements.transactionDate.value = localDate.toISOString().split('T')[0];
+}
 
   loadData() {
     // Carrega os dados do localStorage (ou usa valores padrão)
@@ -226,6 +225,7 @@ class FinanceApp {
   }
 
   addTransaction() {
+    const generateId = () => Date.now() + '-' + Math.random().toString(36).substr(2, 9);
     const type = this.elements.transactionType.value;
     const date = this.elements.transactionDate.value;
     const description = this.elements.transactionDescription.value.trim();
@@ -404,6 +404,9 @@ class FinanceApp {
     this.updateReports();
     this.renderReminders();
     // Atualiza os gráficos com base nas transações
+    if (this.balanceChartInstance) {
+  this.balanceChartInstance.destroy();
+}
     this.updateBalanceChart(this.transactions);
     this.updateCategoriesChart(this.transactions);
   }
@@ -453,9 +456,10 @@ class FinanceApp {
     if (month) {
       const [year, monthNum] = month.split('-');
       filtered = filtered.filter(t => {
-        const date = new Date(t.date);
-        return date.getFullYear() === parseInt(year) && (date.getMonth() + 1) === parseInt(monthNum);
-      });
+      const date = new Date(t.date);
+        return date.getFullYear() === parseInt(year) && 
+         (date.getMonth() + 1) === parseInt(monthNum);
+});
     }
     filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
     this.updateTransactionsSummaries(filtered);
@@ -526,6 +530,7 @@ class FinanceApp {
     }
     this.updateFixedSummaries(filtered);
     this.renderFixedTransactions(filtered);
+    
   }
 
   updateFixedSummaries(fixedTransactions) {
@@ -551,6 +556,7 @@ class FinanceApp {
   }
 
   renderFixedTransactions(transactions) {
+    `${transaction.type === 'expense' ? '-' : '+'}R$ ${Math.abs(transaction.amount).toFixed(2)}`
     this.elements.fixedContainer.innerHTML = '';
     transactions.forEach(transaction => {
       const li = document.createElement('li');
