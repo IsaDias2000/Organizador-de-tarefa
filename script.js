@@ -578,6 +578,7 @@ if (category !== 'all') {
   }
 
   renderFixedTransactions(transactions) {
+    this.elements.fixedContainer.appendChild(li);
     `${transaction.type === 'expense' ? '-' : '+'}R$ ${Math.abs(transaction.amount).toFixed(2)}`
     this.elements.fixedContainer.innerHTML = '';
     transactions.forEach(transaction => {
