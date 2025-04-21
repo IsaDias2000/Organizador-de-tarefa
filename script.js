@@ -25,6 +25,8 @@ class FinanceApp {
   initElements() {
     // Elementos do DOM
     this.elements = {}
+    this.elements.filterCategory.innerHTML = `...`;
+
       // Formulários
       transactionForm: document.getElementById('transaction-form'),
       reminderForm: document.getElementById('reminder-form'),
