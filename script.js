@@ -1,3 +1,4 @@
+// script.js - FULL FUNCTIONALITY + METAS, LEMBRETES, RELATÓRIOS
 "use strict";
 
 class FinanceApp {
@@ -6,311 +7,173 @@ class FinanceApp {
     this.fixedTransactions = [];
     this.categories = [];
     this.reminders = [];
+    this.goals = [];
     this.currentBalance = 0;
-
-    // Instâncias dos gráficos
     this.balanceChartInstance = null;
     this.categoriesChartInstance = null;
 
     this.initElements();
     this.loadData();
-    this.categories = JSON.parse(localStorage.getItem('categories')) || [
-  { name: 'Sem Categoria', type: 'both', color: '#cccccc' }
-];
-
     this.initEventListeners();
     this.renderAll();
   }
 
   initElements() {
-    // Elementos do DOM
-    this.elements = {}
-    this.elements.filterCategory.innerHTML = `...`;
-
-      // Formulários
-      transactionForm: document.getElementById('transaction-form'),
-      reminderForm: document.getElementById('reminder-form'),
-      categoryForm: document.getElementById('category-form'),
-
-      // Inputs
-      transactionType: document.getElementById('transaction-type'),
-      transactionDate: document.getElementById('transaction-date'),
-      transactionDescription: document.getElementById('transaction-description'),
-      transactionAmount: document.getElementById('transaction-amount'),
-      transactionCategory: document.getElementById('transaction-category'),
-      transactionParceled: document.getElementById('transaction-parceled'),
-      transactionInstallments: document.getElementById('transaction-installments'),
-      transactionFixed: document.getElementById('transaction-fixed'),
-      reminderDescription: document.getElementById('reminder-description'),
-      newCategoryName: document.getElementById('new-category-name'),
-      newCategoryColor: document.getElementById('new-category-color'),
-
-      // Containers
-      transactionsContainer: document.getElementById('transactions-container'),
-      fixedContainer: document.getElementById('fixed-container'),
-      activeReminders: document.getElementById('active-reminders'),
-      completedReminders: document.getElementById('completed-reminders'),
-      cashFlowBody: document.getElementById('cash-flow-body'),
-      goalsContainer: document.getElementById('goals-container'),
-
-      // Filtros
-      filterType: document.getElementById('filter-type'),
-      filterCategory: document.getElementById('filter-category'),
-      filterStatus: document.getElementById('filter-status'),
-      filterMonth: document.getElementById('filter-month'),
-      clearFilters: document.getElementById('clear-filters'),
-      filterFixedType: document.getElementById('filter-fixed-type'),
-      filterFixedStatus: document.getElementById('filter-fixed-status'),
-      filterFixedCategory: document.getElementById('filter-fixed-category'),
-      
-      // Sumários / Relatórios
-      reportPeriodSelect: document.getElementById('reportPeriodSelect'),
-      fixedExpensesSummary: document.getElementById('fixed-expenses-summary'),
-      parceledExpensesSummary: document.getElementById('parceled-expenses-summary'),
-      fixedIncomeSummary: document.getElementById('fixed-income-summary'),
-      fixedExpenseSummary: document.getElementById('fixed-expense-summary'),
-
-      // Displays de saldo e totais
-      currentBalance: document.getElementById('current-balance'),
-      totalIncome: document.getElementById('total-income'),
-      totalExpenses: document.getElementById('total-expenses'),
-
-      // Elementos dos Gráficos
-      balanceChart: document.getElementById('balance-chart'),
-      categoriesChart: document.getElementById('categories-chart'),
-      this.categories = [
-      { name: 'Sem Categoria', type: 'both', color: '#cccccc' },]
-      // Botões
-      addCategoryBtn: document.getElementById('add-category-btn'),
-      themeToggle: document.getElementById('theme-toggle'),
-      clearTransactions: document.getElementById('clear-transactions'),
-      clearCompleted: document.getElementById('clear-completed'),
-      confirmClear: document.getElementById('confirm-clear'),
-      cancelClear: document.getElementById('cancel-clear'),
-
-      // Tabs
-      tabButtons: document.querySelectorAll('.tab-button'),
-      tabContents: document.querySelectorAll('.tab-content'),
-
-      // Modais
-      confirmClearModal: document.getElementById('confirm-clear-modal'),
-      categoryModal: document.getElementById('category-modal'),
-      closeModal: document.querySelector('.close-modal')
+    this.elements = {
+      transactionForm: document.getElementById("transaction-form"),
+      transactionType: document.getElementById("transaction-type"),
+      transactionDate: document.getElementById("transaction-date"),
+      transactionDescription: document.getElementById("transaction-description"),
+      transactionAmount: document.getElementById("transaction-amount"),
+      transactionCategory: document.getElementById("transaction-category"),
+      transactionParceled: document.getElementById("transaction-parceled"),
+      transactionInstallments: document.getElementById("transaction-installments"),
+      transactionFixed: document.getElementById("transaction-fixed"),
+      transactionsContainer: document.getElementById("transactions-container"),
+      currentBalance: document.getElementById("current-balance"),
+      totalIncome: document.getElementById("total-income"),
+      totalExpenses: document.getElementById("total-expenses"),
+      balanceChart: document.getElementById("balance-chart"),
+      categoriesChart: document.getElementById("categories-chart"),
+      filterType: document.getElementById("filter-type"),
+      filterCategory: document.getElementById("filter-category"),
+      filterMonth: document.getElementById("filter-month"),
+      clearFilters: document.getElementById("clear-filters"),
+      // metas
+      goalForm: document.getElementById("goal-form"),
+      goalsContainer: document.getElementById("goals-container"),
+      // lembretes
+      reminderForm: document.getElementById("reminder-form"),
+      activeReminders: document.getElementById("active-reminders-container"),
+      completedReminders: document.getElementById("completed-reminders-container"),
+      clearCompleted: document.getElementById("clear-completed"),
+      // relatórios
+      reportPeriod: document.getElementById("report-period")
     };
-
-    // Configura data padrão para a transação
-const today = new Date();
-const localDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000));
-this.elements.transactionDate.value = localDate.toISOString().split('T')[0];
-}
+  }
 
   loadData() {
-    // Carrega os dados do localStorage (ou usa valores padrão)
-    this.transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-    this.fixedTransactions = JSON.parse(localStorage.getItem('fixedTransactions')) || [];
-    this.categories = JSON.parse(localStorage.getItem('categories')) || [
-      { name: 'Alimentação', type: 'expense', color: '#ef4444' },
-      { name: 'Moradia', type: 'expense', color: '#3b82f6' },
-      { name: 'Transporte', type: 'expense', color: '#10b981' },
-      { name: 'Lazer', type: 'expense', color: '#f59e0b' },
-      { name: 'Salário', type: 'income', color: '#8b5cf6' }
+    this.transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+    this.fixedTransactions = JSON.parse(localStorage.getItem("fixedTransactions")) || [];
+    this.categories = JSON.parse(localStorage.getItem("categories")) || [
+      { name: "Sem Categoria", type: "both", color: "#cccccc" }
     ];
-    this.reminders = JSON.parse(localStorage.getItem('reminders')) || [];
-
-    // Verifica contas fixas do mês atual
-    this.checkFixedTransactions();
+    this.reminders = JSON.parse(localStorage.getItem("reminders")) || [];
+    this.goals = JSON.parse(localStorage.getItem("goals")) || [];
   }
 
   saveData() {
-    localStorage.setItem('transactions', JSON.stringify(this.transactions));
-    localStorage.setItem('fixedTransactions', JSON.stringify(this.fixedTransactions));
-    localStorage.setItem('categories', JSON.stringify(this.categories));
-    localStorage.setItem('reminders', JSON.stringify(this.reminders));
+    localStorage.setItem("transactions", JSON.stringify(this.transactions));
+    localStorage.setItem("fixedTransactions", JSON.stringify(this.fixedTransactions));
+    localStorage.setItem("categories", JSON.stringify(this.categories));
+    localStorage.setItem("reminders", JSON.stringify(this.reminders));
+    localStorage.setItem("goals", JSON.stringify(this.goals));
   }
 
   initEventListeners() {
-    // Eventos para as Tabs
-    this.elements.tabButtons.forEach(button => {
-      button.addEventListener('click', () => this.switchTab(button));
-    });
-
-    // Envio dos formulários
-    this.elements.transactionForm.addEventListener('submit', (e) => {
+    this.elements.transactionForm.addEventListener("submit", (e) => {
       e.preventDefault();
       this.addTransaction();
     });
-    this.elements.reminderForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      this.addReminder();
-    });
-    this.elements.categoryForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      this.addCategory();
-    });
-
-    // Habilita/desabilita o input de parcelas
-    this.elements.transactionParceled.addEventListener('change', (e) => {
+    this.elements.transactionParceled.addEventListener("change", (e) => {
       this.elements.transactionInstallments.disabled = !e.target.checked;
     });
+    this.elements.filterType.addEventListener("change", () => this.renderAll());
+    this.elements.filterCategory.addEventListener("change", () => this.renderAll());
+    this.elements.filterMonth.addEventListener("change", () => this.renderAll());
+    this.elements.clearFilters.addEventListener("click", () => this.clearFilters());
 
-    // Eventos dos filtros
-    this.elements.filterType.addEventListener('change', () => this.filterTransactions());
-    this.elements.filterCategory.addEventListener('change', () => this.filterTransactions());
-    this.elements.filterStatus.addEventListener('change', () => this.filterTransactions());
-    this.elements.filterMonth.addEventListener('change', () => this.filterTransactions());
-    this.elements.clearFilters.addEventListener('click', () => this.clearFilters());
-    this.elements.filterFixedType.addEventListener('change', () => this.filterFixedTransactions());
-    this.elements.filterFixedStatus.addEventListener('change', () => this.filterFixedTransactions());
-    this.elements.filterFixedCategory.addEventListener('change', () => this.filterFixedTransactions());
-    if (category !== 'all') {
-  if (category === 'none') {
-    filtered = filtered.filter(t => !t.category || t.category === 'Sem Categoria');
-  } else {
-    filtered = filtered.filter(t => t.category === category);
-  }
-}
-    // Atualiza os relatórios ao alterar o período
-    if (this.elements.reportPeriodSelect) {
-      this.elements.reportPeriodSelect.addEventListener('change', () => this.updateReports());
-    }
-
-    // Tema claro/escuro
-    this.elements.themeToggle.addEventListener('click', () => {
-      document.documentElement.classList.toggle('light-mode');
-      localStorage.setItem('theme', document.documentElement.classList.contains('light-mode') ? 'light' : 'dark');
-    });
-
-    // Abre o modal para adicionar categoria
-    this.elements.addCategoryBtn.addEventListener('click', () => {
-      this.elements.categoryModal.classList.add('active');
-    });
-
-    // Modal de confirmação de limpeza de transações
-    this.elements.clearTransactions.addEventListener('click', () => {
-      this.elements.confirmClearModal.classList.add('active');
-    });
-    this.elements.confirmClear.addEventListener('click', () => {
-      this.clearAllTransactions();
-      this.elements.confirmClearModal.classList.remove('active');
-    });
-    this.elements.cancelClear.addEventListener('click', () => {
-      this.elements.confirmClearModal.classList.remove('active');
-    });
-
-    // Limpa lembretes concluídos
-    this.elements.clearCompleted.addEventListener('click', () => {
-      this.clearCompletedReminders();
-    });
-
-    // Fechamento dos modais
-    this.elements.closeModal.addEventListener('click', () => {
-      this.elements.categoryModal.classList.remove('active');
-    });
-    document.querySelectorAll('.modal').forEach(modal => {
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-          modal.classList.remove('active');
-        }
+    // metas
+    if (this.elements.goalForm) {
+      this.elements.goalForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        this.addGoal();
       });
-    });
+    }
 
-    // Verifica o tema salvo
-    if (localStorage.getItem('theme') === 'light') {
-      document.documentElement.classList.add('light-mode');
+    // lembretes
+    if (this.elements.reminderForm) {
+      this.elements.reminderForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        this.addReminder();
+      });
+    }
+    if (this.elements.clearCompleted) {
+      this.elements.clearCompleted.addEventListener("click", () => this.clearCompletedReminders());
+    }
+    if (this.elements.reportPeriod) {
+      this.elements.reportPeriod.addEventListener("change", () => this.renderAll());
     }
   }
 
-  switchTab(button) {
-    this.elements.tabButtons.forEach(btn => btn.classList.remove('active'));
-    this.elements.tabContents.forEach(content => content.classList.remove('active'));
-
-    button.classList.add('active');
-    const tabId = button.getAttribute('data-tab');
-    document.getElementById(tabId).classList.add('active');
-
-    if (tabId === 'fixed') {
-      this.filterFixedTransactions();
-    } else if (tabId === 'reminders') {
-      this.renderReminders();
-    } else if (tabId === 'reports') {
-      this.updateReports();
-    }
-  }
-
-  addTransaction() {
-    const generateId = () => Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-    const type = this.elements.transactionType.value;
-    const date = this.elements.transactionDate.value;
-    const description = this.elements.transactionDescription.value.trim();
-    const amount = parseFloat(this.elements.transactionAmount.value);
-    // Agora a categoria é opcional; se não for selecionada, ficará como string vazia.
-    const category = this.elements.transactionCategory.value || 'Sem Categoria'; // Única declaração
-    const isParceled = this.elements.transactionParceled.checked;
-    const installments = isParceled ? parseInt(this.elements.transactionInstallments.value) : 1;
-    const isFixed = this.elements.transactionFixed.checked;
-
-if (!description || isNaN(amount)) { // Mantenha apenas as validações essenciais
-  alert('Preencha todos os campos obrigatórios!');
-  return;
-}
-
-    const newTransaction = {
-      id: Date.now() + Math.floor(Math.random() * 1000),
-      type,
-      date,
-      description,
-      // Se for despesa, garante o valor negativo; se for receita, valor positivo.
-      amount: type === 'expense' ? -Math.abs(amount) : Math.abs(amount),
-      category, // Campo opcional
-      installments,
-      installmentNumber: 1,
-      fixed: isFixed,
-      paid: false,
-      createdAt: new Date().toISOString()
-    };
-
-    this.transactions.push(newTransaction);
-
-    if (isParceled && installments > 1) {
-      const transactionDate = new Date(date);
-      for (let i = 2; i <= installments; i++) {
-        const nextMonth = new Date(transactionDate);
-        nextMonth.setMonth(transactionDate.getMonth() + (i - 1));
-        const installment = {
-          ...newTransaction,
-          id: Date.now() + Math.floor(Math.random() * 1000) + i,
-          date: nextMonth.toISOString().split('T')[0],
-          installmentNumber: i,
-          paid: false
-        };
-        this.transactions.push(installment);
-      }
-    }
-
-    if (isFixed) {
-      this.fixedTransactions.push({ ...newTransaction, originalId: newTransaction.id });
-    }
-
+  addReminder() {
+    const desc = document.getElementById("reminder-description").value.trim();
+    if (!desc) return alert("Preencha a descrição do lembrete.");
+    this.reminders.push({ id: Date.now(), description: desc, completed: false });
     this.saveData();
-    this.renderAll();
-    this.elements.transactionForm.reset();
-    this.elements.transactionDate.value = new Date().toISOString().split('T')[0];
+    this.renderReminders();
   }
 
-  deleteTransaction(id) {
-    if (confirm('Deseja realmente excluir este lançamento?')) {
-      this.transactions = this.transactions.filter(t => t.id !== id);
-      this.fixedTransactions = this.fixedTransactions.filter(t => t.id !== id);
+  toggleReminder(id) {
+    const reminder = this.reminders.find(r => r.id === id);
+    if (reminder) {
+      reminder.completed = !reminder.completed;
       this.saveData();
-      this.renderAll();
+      this.renderReminders();
     }
   }
 
-  clearAllTransactions() {
-    this.transactions = [];
-    this.fixedTransactions = [];
+  clearCompletedReminders() {
+    this.reminders = this.reminders.filter(r => !r.completed);
     this.saveData();
-    this.renderAll();
+    this.renderReminders();
+  }
+
+  renderReminders() {
+    this.elements.activeReminders.innerHTML = "";
+    this.elements.completedReminders.innerHTML = "";
+    this.reminders.forEach(reminder => {
+      const li = document.createElement("li");
+      li.className = reminder.completed ? "reminder-item completed" : "reminder-item";
+      li.innerHTML = `
+        <label>
+          <input type="checkbox" ${reminder.completed ? "checked" : ""}>
+          ${reminder.description}
+        </label>
+      `;
+      li.querySelector("input").addEventListener("change", () => this.toggleReminder(reminder.id));
+      (reminder.completed ? this.elements.completedReminders : this.elements.activeReminders).appendChild(li);
+    });
+  }
+
+  addGoal() {
+    const desc = document.getElementById("goal-description").value.trim();
+    const date = document.getElementById("goal-target-date").value;
+    const amount = parseFloat(document.getElementById("goal-target-amount").value);
+    if (!desc || !date || isNaN(amount)) return alert("Preencha todos os campos da meta.");
+    this.goals.push({ id: Date.now(), description: desc, targetDate: date, targetAmount: amount });
+    this.saveData();
+    this.renderGoals();
+  }
+
+  renderGoals() {
+    this.elements.goalsContainer.innerHTML = "";
+    this.goals.forEach(goal => {
+      const div = document.createElement("div");
+      div.className = "goal-item";
+      div.innerHTML = `<strong>${goal.description}</strong><br><small>Meta: R$ ${goal.targetAmount.toFixed(2)} até ${goal.targetDate}</small>`;
+      this.elements.goalsContainer.appendChild(div);
+    });
+  }
+
+  renderAll() {
+    const filtered = this.filterTransactions();
+    this.updateBalance(filtered);
+    this.renderTransactions(filtered);
+    this.updateBalanceChart(filtered);
+    this.updateCategoriesChart(filtered);
+    this.renderGoals();
+    this.renderReminders();
   }
 
   checkFixedTransactions() {
