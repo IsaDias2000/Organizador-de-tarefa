@@ -24,7 +24,7 @@ class FinanceApp {
 
   initElements() {
     // Elementos do DOM
-    this.elements = {
+    this.elements = {}
       // Formulários
       transactionForm: document.getElementById('transaction-form'),
       reminderForm: document.getElementById('reminder-form'),
@@ -60,11 +60,7 @@ class FinanceApp {
       filterFixedType: document.getElementById('filter-fixed-type'),
       filterFixedStatus: document.getElementById('filter-fixed-status'),
       filterFixedCategory: document.getElementById('filter-fixed-category'),
-      this.elements.filterCategory.innerHTML = `
-      <option value="all">Todas Categorias</option>
-      <option value="none">Sem Categoria</option>
-      ${this.categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}
-      `;
+      
       // Sumários / Relatórios
       reportPeriodSelect: document.getElementById('reportPeriodSelect'),
       fixedExpensesSummary: document.getElementById('fixed-expenses-summary'),
@@ -81,7 +77,7 @@ class FinanceApp {
       balanceChart: document.getElementById('balance-chart'),
       categoriesChart: document.getElementById('categories-chart'),
       this.categories = [
-      { name: 'Sem Categoria', type: 'both', color: '#cccccc' },
+      { name: 'Sem Categoria', type: 'both', color: '#cccccc' },]
       // Botões
       addCategoryBtn: document.getElementById('add-category-btn'),
       themeToggle: document.getElementById('theme-toggle'),
@@ -431,10 +427,6 @@ if (!description || isNaN(amount)) { // Mantenha apenas as validações essencia
         !this.elements.filterCategory ||
         !this.elements.filterFixedCategory) return;
 
-    this.elements.transactionCategory.innerHTML = '<option value="">Sem categoria</option>';
-    this.elements.filterCategory.innerHTML = '<option value="all">Todas Categorias</option>';
-    this.elements.filterFixedCategory.innerHTML = '<option value="all">Todas Categorias</option>';
-
     this.categories.forEach(category => {
       const option1 = document.createElement('option');
       option1.value = category.name;
@@ -474,7 +466,9 @@ if (category !== 'all') {
     <option value="${c.name}">${c.name}</option>
   `).join('')}
 `;
-
+    this.elements.transactionCategory.innerHTML = '<option value="">Sem categoria</option>';
+    this.elements.filterCategory.innerHTML = '<option value="all">Todas Categorias</option>';
+    this.elements.filterFixedCategory.innerHTML = '<option value="all">Todas Categorias</option>';
     if (type !== 'all') {
       filtered = filtered.filter(t => t.type === type);
     }
