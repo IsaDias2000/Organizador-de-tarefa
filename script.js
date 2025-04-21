@@ -15,7 +15,9 @@ class FinanceApp {
     this.initElements();
     this.loadData();
     this.categories = JSON.parse(localStorage.getItem('categories')) || [
-  { name: 'Sem Categoria', type: 'both', color: '#cccccc' },
+  { name: 'Sem Categoria', type: 'both', color: '#cccccc' }
+];
+
     this.initEventListeners();
     this.renderAll();
   }
