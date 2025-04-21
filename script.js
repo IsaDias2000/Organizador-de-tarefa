@@ -771,7 +771,7 @@ if (category !== 'all') {
     const expenses = transactions
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-      const category = expense.category || 'Sem Categoria';
+      
 
     if (this.balanceChartInstance) {
       this.balanceChartInstance.destroy();
